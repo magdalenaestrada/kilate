@@ -14,7 +14,7 @@
                 <div class="card">
                     <div class="row card-header d-flex justify-content-between align-items-center">
                         <div class="col-md-6">
-                            {{ __('ORDENES DE COMPRA REGISTRADAS') }}
+                            {{ __('ORDENESSSSSS DE COMPRA REGISTRADAS') }}
 
                         </div>
                         <div class="col-md-6 text-right">
