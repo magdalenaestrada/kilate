@@ -75,7 +75,7 @@
                                     </div>
                                     <div class="form-group col-md-8 g-3">
                                         <label for="datos_proveedor" class="text-sm">
-                                            {{ __('RAZÓN SOCIAL PROVEEDOR') }}
+                                            {{ __('RAZÓN SOCIAL holahooal') }}
                                         </label>
                                         <input class="form-control form-control-sm"
                                             value="{{ $inventarioingreso->proveedor->razon_social }}" disabled>
