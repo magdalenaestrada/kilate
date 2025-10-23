@@ -13,7 +13,7 @@
     <br>
     <div class="container">
         <div class="text-end">
-            <img style="width: 90px" src="{{asset('images/alfalogo.png')}}" alt="">
+            <img style="width: 90px" src="{{asset('images/terra_mining.jpg')}}" alt="">
         </div>
 
         <div class="text-center" style="margin-top: -10%">

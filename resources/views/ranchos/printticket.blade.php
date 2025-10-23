@@ -28,11 +28,11 @@
 
     <div class="container">
     <br>
-        <p class="text-center mr-1" style="margin-bottom: -5px">MINERA ALFA GOLDEN</p>
+        <p class="text-center mr-1" style="margin-bottom: -5px">TERRA MINING S.R.L</p>
 
 
 
-        <p class="text-center" style="margin-bottom: -5px">{{ __('TICKET') }} ALFA - {{ $rancho->id }}</p>
+        <p class="text-center" style="margin-bottom: -5px">{{ __('TICKET') }} TERRA MINING - {{ $rancho->id }}</p>
 
 
         <p class="text-center" style="margin-bottom: -5px">

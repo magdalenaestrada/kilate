@@ -35,6 +35,12 @@ class OrdenServicio extends Model
         return $date->format('Y-m-d H:i:s');
     }
 
+    public function comprobantes()
+    {
+        return $this->morphMany(Comprobante::class, 'modelo');
+    }
+
+
     protected $casts = [
         'fecha_inicio' => 'datetime',
         'fecha_fin' => 'datetime',

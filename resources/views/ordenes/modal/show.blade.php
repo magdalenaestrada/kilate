@@ -31,20 +31,29 @@
 
                         <div class="form-group col-md-4 g-3">
                             <label class="text-sm">{{ __('FECHA DE CREACIÓN') }}</label>
-                            <input class="form-control form-control-sm"
-                                value="{{ \Carbon\Carbon::parse($ordenServicio->created_at)->format('d/m/Y') }}"
-                                disabled>
+                            <input class="form-control form-control-sm" value="{{ $orden->created_at }}" disabled>
                         </div>
 
                         <div class="form-group col-md-4 g-3">
                             <label class="text-sm">{{ __('ESTADO') }}</label>
-                            <input class="form-control form-control-sm" value="{{ $ordenServicio->estado }}" disabled>
+                            @php
+                                $estados = [
+                                    'P' => ['label' => 'PENDIENTE'],
+                                    'E' => ['label' => 'EN PROCESO'],
+                                    'F' => ['label' => 'COMPLETADO'],
+                                    'A' => ['label' => 'CANCELADO'],
+                                    'C' => ['label' => 'PAGADO'],
+                                ];
+                                $estado = $estados[$orden->estado_servicio]['label'] ?? 'Desconocido';
+
+                            @endphp
+                            <input class="form-control form-control-sm" value="{{ $estado }}" disabled>
                         </div>
 
                         <div class="form-group col-md-4 g-3">
                             <label class="text-sm">{{ __('FECHA INICIO') }}</label>
-                            <input class="form-control form-control-sm" value="{{ $ordenServicio->fecha_inicio }}"
-                                disabled>
+                            <input class="form-control form-control-sm" value="{{ $orden->fecha_inicio }}"
+                            disabled>
                         </div>
 
                         <div class="form-group col-md-4 g-3">

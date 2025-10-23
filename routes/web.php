@@ -264,18 +264,11 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/orden-servicio/search', [OrdenServicioController::class, 'search'])
         ->name('search.ordenservicio');
     Route::get('/orden-servicio/{id}/print', [OrdenServicioController::class, 'print'])->name('orden-servicio.print');
+    Route::get('/orden-servicio/{id}/comprobante', [OrdenServicioController::class, 'comprobante'])->name('orden-servicio.comprobante');
 
-    Route::get('/orden-servicio/{id}/cancelar', [OrdenServicioController::class, 'cancelar'])->name('orden-servicio.cancelar');
-    Route::put('/orden-servicio/{id}/updatecancelar', [OrdenServicioController::class, 'updatecancelar'])->name('orden-servicio.updatecancelar');
-
-    Route::get('/orden-servicio/{id}/recepcionar', [OrdenServicioController::class, 'recepcionar'])->name('orden-servicio.recepcionar');
-    Route::put('/orden-servicio/{id}/updaterecepcionar', [OrdenServicioController::class, 'updaterecepcionar'])->name('orden-servicio.updaterecepcionar');
-
-    Route::get('/orden-servicio/{id}/cancelaralcredito', [OrdenServicioController::class, 'cancelaralcredito'])->name('orden-servicio.cancelaralcredito');
-    Route::put('/orden-servicio/{id}/updatecancelaralcredito', [OrdenServicioController::class, 'updatecancelaralcredito'])->name('orden-servicio.updatecancelaralcredito');
-
-    Route::get('/orden-servicio/{id}/cancelaracuenta', [OrdenServicioController::class, 'cancelaracuenta'])->name('orden-servicio.cancelaracuenta');
-    Route::put('/orden-servicio/{id}/updatecancelaracuenta', [OrdenServicioController::class, 'updatecancelaracuenta'])->name('orden-servicio.updatecancelaracuenta');
+    Route::post('/orden-servicio/{id}/cancelar', [OrdenServicioController::class, 'cancelar'])->name('orden-servicio.cancelar');
+    Route::post('/orden-servicio/{id}/proceso', [OrdenServicioController::class, 'proceso'])->name('orden-servicio.proceso');
+    Route::post('/orden-servicio/{id}/finalizar', [OrdenServicioController::class, 'finalizar'])->name('orden-servicio.finalizar');
 });
 
 Route::get('/', function () {

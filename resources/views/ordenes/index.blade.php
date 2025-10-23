@@ -86,19 +86,39 @@
                                         <td class="d-flex justify-content-center">
                                             <button class="btn btn-sm btn-outline-primary" data-toggle="modal"
                                                 data-target="#ModalShow{{ $orden->id }}">
-                                                Ver
+                                                <i class="fas fa-eye"></i>
                                             </button>
 
-                                            @if ($orden->estado_servicio !== 'A')
-                                                <a href="{{ route('orden-servicio.edit', $orden->id) }}"
-                                                    class="btn btn-outline-warning btn-sm mx-1">
-                                                    <i class="fas fa-edit"></i>
-                                                </a>
-                                                <a href="{{ route('orden-servicio.anular', $orden->id) }}"
-                                                    class="btn btn-danger btn-sm mx-1 anular-orden-servicio"
+                                            @if ($orden->estado_servicio !== 'A' && $orden->estado_servicio !== 'C')
+                                                @if ($orden->estado_servicio !== 'F')
+                                                    <a href="{{ route('orden-servicio.edit', $orden->id) }}"
+                                                        class="btn btn-outline-warning btn-sm mx-1">
+                                                        <i class="fas fa-edit"></i>
+                                                    </a>
+                                                @endif
+                                                @if ($orden->estado_servicio !== 'F' && $orden->estado_servicio !== 'E')
+                                                    <form action="{{ route('orden-servicio.proceso', $orden->id) }}"
+                                                        method="POST">
+                                                        @csrf
+                                                        <button type="submit" class="btn btn-light btn-sm">
+                                                            <i class="fa-solid fa-gear"></i>INICIAR
+                                                        </button>
+                                                    </form>
+                                                @endif
+                                                <a href="{{ route('orden-servicio.comprobante', $orden->id) }}"
+                                                    class="btn btn-primary btn-sm mx-1 comprobante-orden-servicio"
                                                     data-id="{{ $orden->id }}">
-                                                    ANULAR
+                                                    PAGAR
                                                 </a>
+                                            @endif
+                                            @if ($orden->estado_servicio === 'E')
+                                                <form action="{{ route('orden-servicio.finalizar', $orden->id) }}"
+                                                    method="POST">
+                                                    @csrf
+                                                    <button type="submit" class="btn btn-success btn-sm">
+                                                        <i class="fa-solid fa-gear"></i>COMPLETAR
+                                                    </button>
+                                                </form>
                                             @endif
                                             <div class="ml-1" style="margin-top: -10px">
                                                 <a href="{{ route('orden-servicio.print', $orden->id) }}" class="btnprn"
@@ -124,7 +144,13 @@
                                                 </a>
 
                                             </div>
-
+                                            @if ($orden->estado_servicio === 'P')
+                                                <a href="{{ route('orden-servicio.anular', $orden->id) }}"
+                                                    class="btn btn-danger btn-sm mx-1 anular-orden-servicio"
+                                                    data-id="{{ $orden->id }}">
+                                                    X
+                                                </a>
+                                            @endif
                                         </td>
                                     </tr>
                                 @empty

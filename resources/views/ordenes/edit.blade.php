@@ -365,45 +365,47 @@
 @section('js')
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-            console.log("✅ Script actualizado cargado correctamente");
-
             // 🔹 Recalcular subtotal visualmente
             function recalcularFila(fila) {
                 const cantidad = parseFloat(fila.querySelector('.cantidad').value) || 0;
                 const precio = parseFloat(fila.querySelector('.precio_unitario').value) || 0;
-                const subtotal = cantidad * precio;
 
-                // Mostrar en el span
+                const subtotal = cantidad * precio;
+                const total_igv = subtotal * 1.18; // incluye IGV
+
                 const subtotalElemento = fila.querySelector('.subtotal-valor');
                 if (subtotalElemento) {
                     subtotalElemento.textContent = subtotal.toFixed(2);
                 }
-                return subtotal;
+
+                // ✅ Devolvemos ambos valores como objeto
+                return {
+                    subtotal,
+                    total_igv
+                };
             }
 
-            // 🔹 Recalcular totales (estimado y final)
             function recalcularTotales() {
-                let total = 0;
+                let totalSubtotal = 0;
+                let totalConIgv = 0;
+
                 document.querySelectorAll('#tablaDetalles tbody tr').forEach(fila => {
-                    total += recalcularFila(fila);
+                    const {
+                        subtotal,
+                        total_igv
+                    } = recalcularFila(fila);
+                    totalSubtotal += subtotal;
+                    totalConIgv += total_igv;
                 });
 
-                document.querySelector('input[name="costo_estimado"]').value = total.toFixed(2);
-                document.querySelector('input[name="costo_final"]').value = total.toFixed(2);
+                document.querySelector('input[name="costo_estimado"]').value = totalSubtotal.toFixed(2);
+                document.querySelector('input[name="costo_final"]').value = totalConIgv.toFixed(2);
 
                 const totalDisplay = document.getElementById('totalDisplay');
-                if (totalDisplay) totalDisplay.textContent = "S/ " + total.toFixed(2);
-            }
-
-            // 🔹 Al cambiar cantidad o precio
-            document.addEventListener('input', function(e) {
-                if (e.target.classList.contains('cantidad') || e.target.classList.contains(
-                        'precio_unitario')) {
-                    const fila = e.target.closest('tr');
-                    recalcularFila(fila);
-                    recalcularTotales();
+                if (totalDisplay) {
+                    totalDisplay.textContent = "S/ " + totalConIgv.toFixed(2);
                 }
-            });
+            }
 
             // 🔹 Agregar nueva fila visual
             document.getElementById('agregarFila').addEventListener('click', function() {

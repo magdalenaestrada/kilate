@@ -1,6 +1,6 @@
 {
-    "name" : "SistemaAlfa",
-    "short_name": "SistemaAlfa",
+    "name" : "TerraMining",
+    "short_name": "TerraMining",
     "description": "",
     "start_url": "http://app.local",
     "display": "standalone",

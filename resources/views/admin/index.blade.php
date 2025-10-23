@@ -48,7 +48,7 @@
                 <span class="shadow"></span>
             </div>
         </div>
-        <h1>MINERA ALFA GOLDEN</h1>
+        <h1>TERRA MINING S.R.L</h1>
         <div class="pyramid-loader">
             <div class="wrapper">
                 <span class="side side1"></span>

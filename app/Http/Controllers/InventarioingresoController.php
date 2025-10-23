@@ -119,11 +119,6 @@ class InventarioingresoController extends Controller
             $inventarioingreso->save();
 
 
-
-
-
-
-
             // Redirect to a relevant page, e.g., order index or show
             return redirect()->route('inventarioingresos.index')->with('crear-orden', 'Orden de compra creada con éxito.');
         } catch (ValidationException $e) {
@@ -195,18 +190,11 @@ public function update(Request $request, string $id)
         //
     }
 
-
-
-
-
-
     public function cancelar(string $id)
     {
         $inventarioingreso = Inventarioingreso::findOrFail($id);
         return view('inventarioingresos.cancelar', compact('inventarioingreso'));
     }
-
-
 
     public function updatecancelar(Request $request, string $id)
     {

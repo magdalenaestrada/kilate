@@ -4,11 +4,15 @@ namespace App\Http\Controllers;
 
 use App\Exports\OrdenServicioExport;
 use App\Exports\OrdenServicioFullExport;
+use App\Http\Requests\Comprobante\SubmitComprobanteRequest;
 use App\Http\Requests\OrdenServicio\SubmitOrdenServicioRequest;
+use App\Models\Comprobante;
 use App\Models\DetalleOrdenServicio;
 use App\Models\OrdenServicio;
 use App\Models\Proveedor;
 use Carbon\Carbon;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
 use Yajra\DataTables\Facades\DataTables;
@@ -247,6 +251,44 @@ class OrdenServicioController extends Controller
         }
     }
 
+    public function finalizar($id)
+    {
+        try {
+            $orden = OrdenServicio::findOrFail($id);
+
+            // Cambia el estado
+            $orden->estado_servicio = 'F';
+            $orden->save();
+
+            return redirect()
+                ->route('orden-servicio.index')
+                ->with('success', 'La orden de servicio ha sido completada correctamente.');
+        } catch (\Exception $e) {
+            return redirect()
+                ->route('orden-servicio.index')
+                ->with('error', 'Ocurrió un error al completar la orden: ' . $e->getMessage());
+        }
+    }
+
+    public function proceso($id)
+    {
+        try {
+            $orden = OrdenServicio::findOrFail($id);
+
+            // Cambia el estado
+            $orden->estado_servicio = 'E';
+            $orden->save();
+
+            return redirect()
+                ->route('orden-servicio.index')
+                ->with('success', 'La orden de servicio se está completando.');
+        } catch (\Exception $e) {
+            return redirect()
+                ->route('orden-servicio.index')
+                ->with('error', 'Ocurrió un error al editar la orden: ' . $e->getMessage());
+        }
+    }
+
 
 
     public function print(string $id)
@@ -258,52 +300,39 @@ class OrdenServicioController extends Controller
         return view('ordenes.ticket', compact('orden'));
     }
 
-    public function cancelar(string $id)
+    public function cancelar(Request $request, string $id)
     {
         $orden = OrdenServicio::findOrFail($id);
-        return view('ordenes.cancelar', compact('orden'));
-    }
-
-    public function updatecancelar(SubmitOrdenServicioRequest $request, string $id)
-    {
-        $request->validate([
-            'comprobante_correlativo' => 'required',
-            'fecha_cancelacion' => 'required',
-            'fecha_emision_comprobante' => 'required',
-            'tipopago' => 'required',
-
+        $comprobante = $orden->comprobantes()->create([
+            'total' => $orden->costo_final,
+            'tipo_pago' => $request->tipopago,
+            'usuario_cancelacion' => Auth::id(),
+            'fecha_cancelacion' => $request->fecha_cancelacion,
+            'fecha_emision' => $request->fecha_emision,
+            'comprobante_correlativo' => $request->comprobante_correlativo,
         ]);
-        $orden = Inventarioingreso::findOrFail($id);
+        $orden->update([
+            'estado_servicio' => 'C',
+        ]);
+        activity()
+            ->causedBy(Auth::user())
+            ->performedOn($comprobante)
+            ->withProperties([
+                'orden_id' => $orden->id,
+                'total' => $orden->costo_final,
+            ])
+            ->log('Creó un comprobante para la orden de servicio');
 
-
-        if ($orden->estado !== 'PENDIENTE') {
-            throw new HttpException(403, 'No puedes acceder a esta página');
-        }
-
-
-
-        $orden->comprobante_correlativo = $request->input('comprobante_correlativo');
-        $orden->fecha_cancelacion = $request->input('fecha_cancelacion');
-        $orden->tipocomprobante = 'FACTURA';
-        $orden->tipopago = $request->input('tipopago');
-        $orden->fecha_emision_comprobante = $request->input('fecha_emision_comprobante');
-        $orden->usuario_cancelacion = auth()->user()->name;
-        $orden->estado = 'POR RECOGER';
-        $orden->cambio_dolar_precio_venta =  $request->input('cambio_dia');
-
-        if ($request->input('tipopago') == 'CONTADO') {
-            $orden->estado_pago = 'CANCELADO AL CONTADO';
-        } elseif ($request->input('tipopago') == 'A CUENTA') {
-            $orden->estado_pago = 'PENDIENTE A CUENTA';
-        } else {
-            $orden->estado_pago = 'PENDIENTE AL CRÉDITO';
-        }
-
-        $orden->save();
-
-        return redirect()->route('ordenes.index')->with('cancelar-orden-compra', 'Orden de compra cancelada exitosamente.');
+        return redirect()
+            ->route('orden-servicio.index')
+            ->with('success', 'Comprobante registrado y actividad guardada.');
     }
-    public function search(SubmitOrdenServicioRequest $request)
+    public function comprobante(string $id)
+    {
+        $orden = OrdenServicio::findOrFail($id);
+        return view('ordenes.comprobante', compact('orden'));
+    }
+    public function search(Request $request)
     {
         $search = $request->get('search');
 
@@ -318,6 +347,6 @@ class OrdenServicioController extends Controller
             ->orderBy('id', 'desc')
             ->get();
 
-        return view('orden-servicio.partials._rows', compact('ordenes'));
+        return view('ordenes.partials._rows', compact('ordenes'));
     }
 }

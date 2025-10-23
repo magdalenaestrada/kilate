@@ -9,7 +9,7 @@
     <meta name="mobile-web-app-capable" content="yes">
 
 
-    <title>Alfa</title>
+    <title>TERRA MINING</title>
 
 
     <!-- Fonts -->
@@ -62,7 +62,7 @@
             </script>
         </ul>
         <div style="margin-top: 27px" id="flipdown" class="flipdown"></div>
-        <h1>Minera Alfa Golden</h1>
+        <h1>Terra Mining S.R.L</h1>
 
       
 

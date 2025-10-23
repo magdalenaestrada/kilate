@@ -15,7 +15,7 @@ return [
     */
 
     'title' => '',
-    'title_prefix' => 'SISTEMA ALFA |',
+    'title_prefix' => 'SISTEMA TERRA MINING |',
     'title_postfix' => '',
 
     /*
@@ -63,12 +63,12 @@ return [
     |
     */
 
-    'logo' => '<b>SISTEMA </b>ALFA',
-    'logo_img' => 'vendor/adminlte/dist/img/alfalogo.png',
+    'logo' => '<b>TERRA MINING</b>',
+    'logo_img' => 'vendor/adminlte/dist/img/terra_mining.jpg',
     'logo_img_class' => 'brand-image  ',
     'logo_img_xl' => null,
     'logo_img_xl_class' => '',
-    'logo_img_alt' => 'ALFA LOGO',
+    'logo_img_alt' => 'TERRA MINING LOGO',
 
     /*
     |--------------------------------------------------------------------------
@@ -113,8 +113,8 @@ return [
         'enabled' => false,
         'mode' => 'fullscreen',
         'img' => [
-            'path' => 'vendor/adminlte/dist/img/alfalogo.png',
-            'alt' => 'Alfa logo preloader imagw',
+            'path' => 'vendor/adminlte/dist/img/terra_mining.jpg',
+            'alt' => 'Terra mining logo preloader imagw',
             'effect' => 'animation__shake',
             'width' => 60,
             'height' => 60,
@@ -367,6 +367,11 @@ return [
                     'can' => 'ver producto',
                 ],
                 [
+                    'text' => 'Ordenes de servicio',
+                    'url' => '/orden-servicio',
+                    'can' => 'ver producto',
+                ],
+                [
                     'text' => 'Ordenes de compra',
                     'url' => '/inventarioingresos',
                     'can' => 'ver producto',
@@ -422,12 +427,6 @@ return [
                 ],
 
             ],
-        ],
-
-        ['header' => 'ORDENES DE SERVICIO', 'can' => 'ver producto'],
-        [
-            'text' => 'Ordenes de servicio',
-            'route' => 'orden-servicio.index',
         ],
 
         ['header' => 'CONFIGURACIÓN DE CUENTAS', 'can' => 'ver producto'],

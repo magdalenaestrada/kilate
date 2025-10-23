@@ -10,11 +10,11 @@
                         <div class="row justify-content-between">
                             <div class="col-md-6">
                                 <h6 class="mt-2">
-                                    {{ __('CANCELAR ORDEN DE COMPRA') }}
+                                    {{ __('CANCELAR ORDEN DE SERVICIO') }}
                                 </h6>
                             </div>
                             <div class="col-md-6 text-right">
-                                <a class="btn btn-danger btn-sm" href="{{ route('inventarioingresos.index') }}">
+                                <a class="btn btn-danger btn-sm" href="{{ route('orden-servicio.index') }}">
                                     {{ __('VOLVER') }}
                                 </a>
                             </div>
@@ -22,71 +22,59 @@
                     </div>
 
                     <div class="card-body">
-
-
-                        <div class="form-group" >
-
-
-
-
+                        <div class="form-group">
                             <div class="row" style="margin-top:-10px">
-
-                                <div class="form-group col-md-4 g-3">
-                                    <label for="inventarioingreso_fin" class="text-sm">
-                                        {{ __('FECHA DE CREACIÓN') }}
+                                <div class="form-group col-md-3 g-3">
+                                    <label for="documento_proveedor" class="text-sm">
+                                        {{ __('RUC PROVEEDOR') }}
                                     </label>
-                                    <input class="form-control form-control-sm" value="{{ $inventarioingreso->created_at }}"
-                                        disabled>
+                                    <div class="input-group">
+                                        <input class="form-control form-control-sm" value="{{ $orden->proveedor->ruc }}"
+                                            disabled>
+                                    </div>
                                 </div>
-
-                                <div class="form-group col-md-4 g-3">
-                                    <label for="inventarioingreso_fin" class="text-sm">
-                                        {{ __('CREADOR DE LA ORDEN') }}
+                                <div class="form-group col-md-5 g-3">
+                                    <label for="datos_proveedor" class="text-sm">
+                                        {{ __('RAZÓN SOCIAL PROVEEDOR') }}
                                     </label>
                                     <input class="form-control form-control-sm"
-                                        value="{{ $inventarioingreso->usuario_ordencompra }}" disabled>
+                                        value="{{ $orden->proveedor->razon_social }}" disabled>
                                 </div>
-
-
-                                <div class="form-group col-md-4 g-3">
+                                <div class="form-group col-md-2 g-3">
                                     <label for="inventarioingreso_fin" class="text-sm">
                                         {{ __('ESTADO DE LA ORDEN') }}
                                     </label>
-                                    <input class="form-control form-control-sm" value="{{ $inventarioingreso->estado }}"
-                                        disabled>
+                                    @php
+                                        $estados = [
+                                            'P' => ['label' => 'PENDIENTE'],
+                                            'E' => ['label' => 'EN PROCESO'],
+                                            'F' => ['label' => 'COMPLETADO'],
+                                            'A' => ['label' => 'CANCELADO'],
+                                            'C' => ['label' => 'PAGADO'],
+                                        ];
+                                        $estado = $estados[$orden->estado_servicio]['label'] ?? 'Desconocido';
+
+                                    @endphp
+                                    <input class="form-control form-control-sm" value="{{ $estado }}" disabled>
+                                </div>
+                                <div class="form-group col-md-2 g-3">
+                                    <label for="inventarioingreso_fin" class="text-sm">
+                                        {{ __('FECHA DE CREACIÓN') }}
+                                    </label>
+                                    <input class="form-control form-control-sm" value="{{ $orden->created_at }}" disabled>
                                 </div>
                             </div>
 
 
 
 
-                            @if ($inventarioingreso->proveedor)
+                            @if ($orden->proveedor)
                                 <div class="row mb-3">
-
-                                    <div class="form-group col-md-4 g-3">
-                                        <label for="documento_proveedor" class="text-sm">
-                                            {{ __('RUC PROVEEDOR') }}
-                                        </label>
-                                        <div class="input-group">
-                                            <input class="form-control form-control-sm"
-                                                value="{{ $inventarioingreso->proveedor->ruc }}" disabled>
-
-                                        </div>
-                                    </div>
-                                    <div class="form-group col-md-8 g-3">
-                                        <label for="datos_proveedor" class="text-sm">
-                                            {{ __('RAZÓN SOCIAL PROVEEDOR') }}
-                                        </label>
-                                        <input class="form-control form-control-sm"
-                                            value="{{ $inventarioingreso->proveedor->razon_social }}" disabled>
-                                    </div>
-
-
                                     <div class="form-group col-md-12 g-3">
                                         <label for="descripcion" class="text-sm">
                                             {{ __('OBSERVACIÓN') }}
                                         </label>
-                                        <textarea class="form-control form-control-sm" disabled>{{ $inventarioingreso->descripcion ? $inventarioingreso->descripcion : 'No hay observación' }}</textarea>
+                                        <textarea class="form-control form-control-sm" disabled>{{ $orden->descripcion ? $orden->descripcion : 'No hay observación' }}</textarea>
                                     </div>
 
 
@@ -99,7 +87,7 @@
 
 
                             <div class="mt-2 table-responsive">
-                                @if (count($inventarioingreso->productos) > 0)
+                                @if (count($orden->detalles) > 0)
                                     <table class="table table-striped table-hover">
                                         <thead>
                                             <tr class="text-center">
@@ -120,40 +108,30 @@
                                                 <th scope="col">
                                                     {{ __('SUBTOTAL') }}
                                                 </th>
-                                               
+
 
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            @foreach ($inventarioingreso->productos as $producto)
+                                            @foreach ($orden->detalles as $detalle)
                                                 <tr class="text-center">
                                                     <td scope="row">
-                                                        {{ $producto->nombre_producto }}
+                                                        {{ $detalle->descripcion }}
                                                     </td>
                                                     <td scope="row">
-                                                        {{ $producto->pivot->created_at }}
+                                                        {{ $detalle->created_at }}
                                                     </td>
                                                     <td scope="row">
-                                                        {{ $producto->pivot->cantidad }}
+                                                        {{ $detalle->cantidad }}
                                                     </td>
                                                     <td scope="row">
-                                                        {{ $producto->pivot->precio }}
+                                                        {{ $detalle->precio_unitario }}
                                                     </td>
                                                     <td scope="row" class="text-right">
-                                                         {{$producto->pivot->subtotal,2}}
+                                                        {{ $detalle->subtotal, 2 }}
                                                     </td>
-                                               
-
-
-
-
-
-
-
                                                 </tr>
                                             @endforeach
-
-
                                             <tr class="table-warning">
                                                 <td></td>
                                                 <td></td>
@@ -162,7 +140,7 @@
 
                                                 <td class="text-end">
                                                     <div class="text-right">
-                                                        {{ number_format($inventarioingreso->subtotal, 2) }}</div>
+                                                        {{ number_format($orden->costo_estimado, 2) }}</div>
                                                 </td>
                                             </tr>
                                         </tbody>
@@ -173,52 +151,33 @@
                                 @endif
                             </div>
 
+                            <p class="text-center h5"> IMPORTE TOTAL: {{ $orden->costo_final }}
+                                {{ $orden->tipomoneda }}</p>
 
-           
-                            <p class="text-center h5"> IMPORTE TOTAL: {{ $inventarioingreso->total }}
-                                {{ $inventarioingreso->tipomoneda }}</p>
-
-
-
-
-
-
-
-
-
-                            <form action="{{ route('inventarioingresos.updatecancelar', $inventarioingreso->id) }}"
-                                method="POST">
+                            <form action="{{ route('orden-servicio.cancelar', $orden->id) }}" method="POST">
                                 @csrf
-                                @method('PUT')
                                 <div class="row">
-                                    <div class="form-group col-md-4 g-3">
+                                    <div class="form-group col-md-3 g-3">
                                         <label for="fecha_cancelacion" class="text-sm">
                                             {{ __('FECHA DE CANCELACION') }}
                                         </label>
-                                        <input required class="form-control form-control-sm" type="datetime-local"
+                                        <input required class="form-control form-control-sm" type="date"
                                             name="fecha_cancelacion">
                                     </div>
+                                    @php
+                                        use Carbon\Carbon;
+                                        $hoy = Carbon::now('America/Lima');
+                                    @endphp
 
-
-
-
-
-
-
-
-
-
-
-
-                                    <div class="form-group col-md-4 g-3">
+                                    <div class="form-group col-md-3 g-3">
                                         <label for="comprobante_correlativo" class="text-sm">
                                             {{ __('COMPROBANTE CORRELATIVO') }}
                                         </label>
-                                        <input class="form-control form-control-sm" required type="text"
-                                            name="comprobante_correlativo">
+                                        <input id="comprobante_correlativo" class="form-control" type="text"
+                                            maxlength="13" name="comprobante_correlativo" required>
                                     </div>
 
-                                    <div class="form-group col-md-4 g-3">
+                                    <div class="form-group col-md-3 g-3">
                                         <label for="tipopago" class="text-sm">
                                             {{ __('TIPO PAGO') }}
                                         </label>
@@ -240,16 +199,18 @@
                                         </select>
                                     </div>
 
-                                    <div class="form-group col-md-4 g-3">
-                                        <label for="fecha_emision_comprobante" class="text-sm">
+                                    <div class="form-group col-md-3 g-3">
+                                        <label for="fecha_emision" class="text-sm">
                                             {{ __('FECHA DE EMISIÓN COMPROBANTE') }}
                                         </label>
-                                        <input class="form-control form-control-sm" required id="fecha_emision_comprobante"
-                                            type="date" name="fecha_emision_comprobante">
+                                        <input class="form-control form-control-sm" required id="fecha_emision"
+                                            type="date" name="fecha_emision"
+                                            max="{{ $hoy->format('Y-m-d') }}">
+
                                     </div>
 
-                                    @if ($inventarioingreso->tipomoneda == 'DOLARES')
-                                        <div class="form-group col-md-4 g-3">
+                                    @if ($orden->tipomoneda == 'DOLARES')
+                                        <div class="form-group col-md-3 g-3">
                                             <label for="cambio_dia" class="text-sm ">
                                                 {{ __('CAMBIO DEL DÍA') }}
                                             </label>
@@ -257,9 +218,6 @@
                                                 id="cambio_dia">
                                         </div>
                                     @endif
-
-
-
 
                                     <div class="col-md-12 text-right g-3 ">
                                         <button type="submit" class="btn btn-sm btn-info  ">
@@ -269,12 +227,6 @@
 
                                 </div>
                             </form>
-
-
-
-
-
-
                         </div>
 
                     </div>
@@ -286,7 +238,7 @@
         <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
         <script>
             $(document).ready(function() {
-                $('#fecha_emision_comprobante').change(function() {
+                $('#fecha_emision').change(function() {
                     var selectedDate = $(this).val();
 
                     $.ajax({
@@ -304,6 +256,20 @@
                         }
                     });
                 });
+            });
+        </script>
+        <script>
+            const inp = document.getElementById('comprobante_correlativo');
+
+            inp.addEventListener('input', () => {
+                // quitar todo menos letras y dígitos
+                let v = inp.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+
+                // separar serie (primeros 4) y correlativo (siguientes hasta 8)
+                const serie = v.slice(0, 4);
+                const correl = v.slice(4, 12);
+
+                inp.value = correl ? `${serie}-${correl}` : serie;
             });
         </script>
     @endpush
