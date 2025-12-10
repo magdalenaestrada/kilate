@@ -406,7 +406,6 @@ return [
                     'can' => 'ver producto',
                 ],
 
-
                 [
                     'text' => 'Prestamos',
                     'submenu' => [
@@ -453,6 +452,57 @@ return [
                 ],
             ],
         ],
+        ['header' => 'LIQUIDACIONES', 'can' => 'ver producto'],
+        [
+            'text' => 'Liquidaciones',
+            'can' => 'ver producto',
+            'submenu' => [
+                [
+                    'text' => 'Lotes',
+                    'url' => '/lotes',
+                    'can' => 'ver producto',
+                ],
+                [
+                    'text' => 'Reactivos',
+                    'url' => '/reactivos',
+                    'can' => 'ver producto',
+                ],
+                [
+                    'text' => 'Pesos',
+                    'url' => '/pesos',
+                    'can' => 'ver producto',
+                ],
+                [
+                    'text' => 'Molienda',
+                    'url' => '/molienda',
+                    'can' => 'ver producto',
+                ],
+                [
+                    'text' => 'Programaciones',
+                    'url' => '/programaciones',
+                    'can' => 'ver producto',
+                ],
+                [
+                    'text' => 'Liquidaciones',
+                    'url' => '/liquidaciones',
+                    'can' => 'ver producto',
+                ],
+
+            ],
+        ],
+        ['header' => 'PROCESOS', 'can' => 'ver producto'],
+
+        [
+            'text' => 'Procesos',
+            'url' => '/procesos',
+            'can' => 'ver producto',
+        ],
+        [
+            'text' => 'Stock reactivos',
+            'url' => '/reactivos/stock',
+            'can' => 'ver producto',
+        ],
+
         ['header' => 'COMEDOR', 'can' => 'ver producto'],
 
         [

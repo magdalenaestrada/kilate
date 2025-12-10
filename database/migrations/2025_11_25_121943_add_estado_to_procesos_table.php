@@ -11,11 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('lotes', function (Blueprint $table) {
-            $table->id();
-            $table->string('nombre');
-            $table->string('usuario');
-            $table->timestamps();
+        Schema::table('procesos', function (Blueprint $table) {
+            $table->char("estado")->default("P");
         });
     }
 
@@ -24,6 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('lotes');
+        Schema::table('procesos', function (Blueprint $table) {
+            //
+        });
     }
 };

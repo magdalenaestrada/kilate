@@ -1,61 +1,61 @@
-<div class="modal fade text-left" id="ModalCreate"  role="dialog" aria-hidden="true">
-    <div class="modal-dialog modal-lg"  role="document">
+<div class="modal fade text-left" id="ModalCreate" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
-                <div class="card-header">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <h6 class="mt-2">
-                                {{ __('CREAR INGRESO RÁPIDO') }}
-                            </h6>
-                        </div>
-                        <div class="col-md-6 text-right">
-                            <button type="button" style="font-size: 30px" class="close" data-dismiss="modal" aria-label="Close">
-                                <img style="width: 13px" src="{{ asset('images/icon/close.png') }}" alt="cerrar">
-                            </button>
-                        </div>
+            <div class="card-header">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6 class="mt-2">
+                            {{ __('CREAR INGRESO RÁPIDO') }}
+                        </h6>
+                    </div>
+                    <div class="col-md-6 text-right">
+                        <button type="button" style="font-size: 30px" class="close" data-dismiss="modal"
+                            aria-label="Close">
+                            <img style="width: 13px" src="{{ asset('images/icon/close.png') }}" alt="cerrar">
+                        </button>
                     </div>
                 </div>
-                <div class="card-body">
+            </div>
+            <div class="card-body">
                 <form method="POST" action="{{ route('invingresosrapidos.store') }}">
                     @csrf
                     <div class="table-responsive">
                         <table class="table table-bordered">
                             <thead class="text-center">
-                            <tr>
-    
-    
-                                
-                                <th>
-                                    {{ __('PRODUCTO') }}
-                                </th>
-                                <th>
-                                    {{ __('VALOR') }}
-                                </th>
-                                <th>
-                                    {{ __('CANTIDAD') }}
-                                </th>
-    
-    
-                                <th>
-                                    {{ __('SUBTOTAL') }}
-                                </th>
-    
-                            
-                                <th>
-                                    <button class="btn btn-sm btn-outline-dark pull-right" type="button" onclick="create_tr('table_body')" id="addMoreButton">
-                                        <img style="width: 15px" src="{{ asset('images/icon/mas.png') }}" alt="más">
-                                    </button>
-                                </th>
-    
-    
-                            </tr>
+                                <tr>
+                                    <th style="width: 300px;"> {{ __('PRODUCTO') }}
+                                    </th>
+                                    <th>
+                                        {{ __('VALOR') }}
+                                    </th>
+                                    <th>
+                                        {{ __('CANTIDAD') }}
+                                    </th>
+
+
+                                    <th>
+                                        {{ __('SUBTOTAL') }}
+                                    </th>
+
+
+                                    <th>
+                                        <button class="btn btn-sm btn-outline-dark pull-right" type="button"
+                                            onclick="create_tr('table_body')" id="addMoreButton">
+                                            <img style="width: 15px" src="{{ asset('images/icon/mas.png') }}"
+                                                alt="más">
+                                        </button>
+                                    </th>
+
+
+                                </tr>
                             </thead>
-    
+
                             <tbody id="table_body">
                                 <tr>
-                                    
+
                                     <td>
-                                        <select name="products[]" class="buscador form-control  cart-product" style="width: 300px; height:32px" required>
+                                        <select name="products[]" class="buscador form-control  cart-product"
+                                            style="width: 300px; height:32px" required>
                                             <option value="">{{ __('-- Seleccione una opción') }}</option>
                                             @foreach ($productos as $producto)
                                                 <option value="{{ $producto->id }}"
@@ -66,28 +66,32 @@
                                         </select>
                                     </td>
                                     <td>
-                                        <input required id="product_price[]" name="product_price[]" class="form-control form-control-sm product-price"
-                                        placeholder="0.0"></input>
+                                        <input required id="product_price[]" name="product_price[]"
+                                            class="form-control form-control-sm product-price"
+                                            placeholder="0.0"></input>
                                     </td>
                                     <td>
-                                        <input required name="qty[]" type="text" 
-                                        class="form-control form-control-sm product-qty" placeholder="0.0" >
+                                        <input required name="qty[]" type="text"
+                                            class="form-control form-control-sm product-qty" placeholder="0.0">
                                     </td>
-                                    
+
                                     <td>
-                                        <input id="item_total" name="item_total[]" class="form-control form-control-sm product-total" placeholder="0.0"></input>
+                                        <input id="item_total" name="item_total[]"
+                                            class="form-control form-control-sm product-total"
+                                            placeholder="0.0"></input>
                                     </td>
                                     <td>
-                                        <button class="btn btn-sm btn-danger" onclick="remove_tr(this)" type="button">Quitar</button>
-    
+                                        <button class="btn btn-sm btn-danger" onclick="remove_tr(this)"
+                                            type="button">Quitar</button>
+
                                     </td>
                                 </tr>
                             </tbody>
-                                         
+
                         </table>
                     </div>
 
-                                                           
+
                     <div class="row mb-3">
                         <div class="form-group col-md-4 g-3">
                             <label for="documento_proveedor" class="text-sm">
@@ -127,60 +131,67 @@
                                 </div>
                             @enderror
                         </div>
-                    </div>             
-                    <div class="row">
-                            <div class="form-group col-md-6 g-3 ">
-                                <label for="tipo_comprobante" class="text-sm">
-                                    {{ __('TIPO COMPROBANTE') }}
-                                </label>
-                                <span class="text-danger">(*)</span>
-                                <select name="tipo_comprobante" id="tipo_comprobante"
-                                    class=" @error('tipo_comprobante') is-invalid @enderror form-control form-control-sm" aria-label="" required>
-                                    <option value="">{{ __('-- Seleccione una opción') }}</option>
-
-                                    <option value="BOLETA" {{ old('tipo_comprobante') == 'BOLETA' ? 'selected' : '' }}>
-                                        BOLETA
-                                    </option>
-                                    <option value="FACTURA" {{ old('tipo_comprobante') == 'FACTURA' ? 'selected' : '' }}>
-                                        FACTURA
-                                    </option>
-                                    <option value="TICKET" {{ old('tipo_comprobante') == 'TICKET' ? 'selected' : '' }}>
-                                        TICKET
-                                    </option>
-                                    <option value="OTRO" {{ old('tipo_comprobante') == 'OTRO' ? 'selected' : '' }}>
-                                        OTRO
-                                    </option>
-                                    
-                                </select>
-                            </div>
-
-                            <div class="form-group col-md-6 g-3 ">
-                                <label for="comprobante_correlativo	" class="text-sm">
-                                            {{ __('COMPROBANTE CORRELATIVO') }}
-                                </label>
-                                <span class="text-danger">(*)</span>
-                                <input required type="text" step="0.01" name="comprobante_correlativo" id="stock" class="form-control form-control-sm @error('comprobante_correlativo') is-invalid @enderror" value="{{ old('comprobante_correlativo') }}" placeholder="Comprobante correlativo...">
-                                @error('comprobante_correlativo')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
-
-                            <div class="form-group col-md-6 g-3 mb-3" id="tipo_comprobante_especifico_group" style="display:none;">
-                                <label for="tipo_comprobante_especifico" class="text-sm">
-                                    {{ __('TIPO COMPROBANTE ESPECIFICO') }}
-                                </label>
-                                <span class="text-danger">(*)</span>
-                                <input type="text" name="tipo_comprobante_especifico" id="tipo_comprobante_especifico" class="form-control form-control-sm">
-                                @error('tipo_comprobante_especifico')
-                                    <span class="invalid-feedback" role="alert">
-                                        <strong>{{ $message }}</strong>
-                                    </span>
-                                @enderror
-                            </div>
-
-                            
                     </div>
-                    
+                    <div class="row">
+                        <div class="form-group col-md-6 g-3 ">
+                            <label for="tipo_comprobante" class="text-sm">
+                                {{ __('TIPO COMPROBANTE') }}
+                            </label>
+                            <span class="text-danger">(*)</span>
+                            <select name="tipo_comprobante" id="tipo_comprobante"
+                                class=" @error('tipo_comprobante') is-invalid @enderror form-control form-control-sm"
+                                aria-label="" required>
+                                <option value="">{{ __('-- Seleccione una opción') }}</option>
+
+                                <option value="BOLETA" {{ old('tipo_comprobante') == 'BOLETA' ? 'selected' : '' }}>
+                                    BOLETA
+                                </option>
+                                <option value="FACTURA" {{ old('tipo_comprobante') == 'FACTURA' ? 'selected' : '' }}>
+                                    FACTURA
+                                </option>
+                                <option value="TICKET" {{ old('tipo_comprobante') == 'TICKET' ? 'selected' : '' }}>
+                                    TICKET
+                                </option>
+                                <option value="OTRO" {{ old('tipo_comprobante') == 'OTRO' ? 'selected' : '' }}>
+                                    OTRO
+                                </option>
+
+                            </select>
+                        </div>
+
+                        <div class="form-group col-md-6 g-3 ">
+                            <label for="comprobante_correlativo	" class="text-sm">
+                                {{ __('COMPROBANTE CORRELATIVO') }}
+                            </label>
+                            <span class="text-danger">(*)</span>
+                            <input required type="text" step="0.01" name="comprobante_correlativo"
+                                id="stock"
+                                class="form-control form-control-sm @error('comprobante_correlativo') is-invalid @enderror"
+                                value="{{ old('comprobante_correlativo') }}"
+                                placeholder="Comprobante correlativo...">
+                            @error('comprobante_correlativo')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+                        <div class="form-group col-md-6 g-3 mb-3" id="tipo_comprobante_especifico_group"
+                            style="display:none;">
+                            <label for="tipo_comprobante_especifico" class="text-sm">
+                                {{ __('TIPO COMPROBANTE ESPECIFICO') }}
+                            </label>
+                            <span class="text-danger">(*)</span>
+                            <input type="text" name="tipo_comprobante_especifico" id="tipo_comprobante_especifico"
+                                class="form-control form-control-sm">
+                            @error('tipo_comprobante_especifico')
+                                <span class="invalid-feedback" role="alert">
+                                    <strong>{{ $message }}</strong>
+                                </span>
+                            @enderror
+                        </div>
+
+
+                    </div>
+
 
                     <div class="d-flex justify-content-end row align-items-center mt-2">
 
@@ -188,9 +199,9 @@
                             <span class="text-sm mr-1"><b>SUBTOTAL:</b></span>
                             <div class="text-right">
 
-                                
-                                <input id="product_sub_total" name="product_sub_total" class="product-sub-total form-control form-control-sm"
-                                    value="0.0"></input>
+
+                                <input id="product_sub_total" name="product_sub_total"
+                                    class="product-sub-total form-control form-control-sm" value="0.0"></input>
 
                             </div>
 
@@ -198,34 +209,35 @@
 
                         <div class="d-flex align-items-center">
                             <span class="text-sm mr-1"><b>TOTAL:</b></span>
-                        
+
                             <div class="text-right">
 
-                            
-                            <input id="product_grand_total" name="product_grand_total" class="product-sub-total form-control form-control-sm"
-                                value="0.0"></input>
+
+                                <input id="product_grand_total" name="product_grand_total"
+                                    class="product-sub-total form-control form-control-sm" value="0.0"></input>
 
                             </div>
 
                         </div>
-                        
-                        
+
+
                         <div class="col-md-2 ">
 
-                            <button class="btn ml-5 btn-sm btn-secondary pull-right" type="submit" id="saveOrder">Guardar</button>
+                            <button class="btn ml-5 btn-sm btn-secondary pull-right" type="submit"
+                                id="saveOrder">Guardar</button>
                         </div>
                     </div>
                 </form>
 
-                </div>
+            </div>
         </div>
     </div>
 </div>
 @section('js')
 
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-    <script src="{{asset('js/interactive.js')}}"></script>
-    
+    <script src="{{ asset('js/crear.js') }}"></script>
+
     <script>
         //Esta función actualiza el subtotal por fila añadida y producto
         function updateRowTotal(row) {
@@ -244,9 +256,9 @@
                 subTotal += parseFloat($(this).val()) || 0;
             });
             //CALCULA EL 18% de impuesto en caso se use factura
-            if (valuetipoComprobanteSelect === 'FACTURA'){
+            if (valuetipoComprobanteSelect === 'FACTURA') {
                 grandTotal = subTotal * 1.18
-            }else{
+            } else {
                 grandTotal = subTotal
             }
             $("#product_sub_total").val(subTotal.toFixed(2));
@@ -255,41 +267,41 @@
         }
 
         $(document).on("input", ".cart-product, .product-qty, .product-price", function() {
-            var row = $(this).closest('tr'); 
+            var row = $(this).closest('tr');
             updateRowTotal(row);
             calculateGrandTotal();
-                    
+
         });
 
         $(document).on("input", ".cart-product", function() {
-                    var product = $(this).val();
-                    var url = "{{ route('get.product-image.by.product', ['product' => ':product']) }}";
-                    url = url.replace(':product', product);
-                    var currentRow = $(this).closest('tr');
+            var product = $(this).val();
+            var url = "{{ route('get.product-image.by.product', ['product' => ':product']) }}";
+            url = url.replace(':product', product);
+            var currentRow = $(this).closest('tr');
 
-                    $.ajax({
-                        url: url,
-                        type: 'GET',
-                        dataType: 'json',
-                        success: function(response) {
-                            if (response.success) {
-                                var product = response.product;
-                                productImage = currentRow.find('.product-image');
-                                productImage.attr('src', product.image);
+            $.ajax({
+                url: url,
+                type: 'GET',
+                dataType: 'json',
+                success: function(response) {
+                    if (response.success) {
+                        var product = response.product;
+                        productImage = currentRow.find('.product-image');
+                        productImage.attr('src', product.image);
 
 
-                            } else {
-                                // Handle error: product not found
-                            }
-                        },
-                        error: function(xhr, status, error) {
-                            // Handle AJAX errors
-                        }
-                    });
+                    } else {
+                        // Handle error: product not found
+                    }
+                },
+                error: function(xhr, status, error) {
+                    // Handle AJAX errors
+                }
+            });
         });
 
 
-    
+
         document.addEventListener('DOMContentLoaded', function() {
             var tipoComprobanteSelect = document.getElementById('tipo_comprobante');
             var tipoComprobanteEspecificoGroup = document.getElementById('tipo_comprobante_especifico_group');
@@ -322,10 +334,7 @@
                     submitButton.style.display = 'block';
                 }
             }
-            
-            $(document).ready(function() {
-            $('.buscador').select2({theme: "classic"});
-            });
+
         });
     </script>
 
@@ -360,26 +369,32 @@
                     saveOrderButton.style.display = 'block';
                 }
             }
-            
-            $(document).ready(function() {
-            $('.buscador').select2({theme: "classic"});
-            });
-            
-            
         });
-        
-        
-        
-        $(document).ready(function() {
-            $('.buscador').select2({theme: "classic"});
-        });
-        
-        
-    </script>  
-        
+    </script>
+
     <!-- Custom script to handle document search -->
-    
+
     <script>
+        function initSelect2ForRow(row) {
+            row.find('.buscador, .cart-product').each(function() {
+                // Destruir instancia previa si existe
+                if ($(this).hasClass("select2-hidden-accessible")) {
+                    $(this).select2('destroy');
+                }
+            });
+
+            row.find('.buscador, .cart-product').select2({
+                theme: "classic",
+                dropdownParent: $("#ModalCreate"),
+                width: '100%',
+                placeholder: "-- Seleccione una opción",
+                allowClear: true,
+                dropdownAutoWidth: false,
+                dropdownCssClass: 'select2-dropdown-custom'
+            });
+        }
+
+
         $(document).ready(function() {
             function isRucOrDni(value) {
                 return value.length === 8 || value.length === 11;
@@ -467,6 +482,25 @@
                 $(this).toggleClass('is-invalid', value.trim().length === 0);
             });
         });
-    </script>
 
+        $('#ModalCreate').on('hidden.bs.modal', function() {
+            $('#table_body').find('.cart-product').each(function() {
+                if ($(this).hasClass('select2-hidden-accessible')) {
+                    $(this).select2('destroy');
+                }
+            });
+        });
+        $('#ModalCreate').on('shown.bs.modal', function() {
+            $('#table_body').find('.cart-product').select2({
+                theme: "classic",
+                dropdownParent: $("#ModalCreate"),
+                width: '100%',
+                placeholder: "-- Seleccione una opción",
+                allowClear: true,
+                dropdownCssClass: 'select2-dropdown-custom',
+                minimumResultsForSearch: 0,
+                closeOnSelect: true
+            });
+        });
+    </script>
 @stop

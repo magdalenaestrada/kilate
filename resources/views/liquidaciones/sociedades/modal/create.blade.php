@@ -20,7 +20,6 @@
                 <form class="crear-sociedad" action="{{ route('lqsociedades.store') }}" method="POST">
                     @csrf
                     <div class="row">
-
                         <div class="form mb-1 col-md-4">
                             <input name="codigo" id="codigo" class=" form-control form-control-sm" placeholder="CÓDIGO DE LA SOCIEDAD..." required="" type="text">
                             <span class="-border"></span>
@@ -49,7 +48,7 @@
                             <tbody id="table_body">
                                 <tr>
                                     <td>
-                                        <select name="clientes[]" class="form-control form-control-sm buscador cart-product" style="width: 400px">
+                                        <select name="clientes[]" class="form-control form-control-sm buscador cart-product" style="width: 400px" required>
                                             <option value="">{{ __('-- SELECCIONE UNA OPCIÓN') }}</option>
                                             @foreach ($clientes as $cliente)
                                                 <option value="{{ $cliente->id }}"

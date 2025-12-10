@@ -33,10 +33,10 @@ class TsReporteContableCuentaExport implements FromCollection, WithTitle, WithSt
         $infoCuenta = $cuenta ? $this->getInformacionCuenta($cuenta) : [['Cuenta no disponible'], []];
 
         $saldoAnterior = $this->calculateSaldoAnterior($cuenta);
-        $saldoAnteriorRow = [['', '', '', '', '', '', '', '', 'SALDO ','ANTERIOR:',$saldoAnterior,$saldoAnterior,'', '']];
+        $saldoAnteriorRow = [['', '', '', '', '', '', '', '', 'SALDO ', 'ANTERIOR:', $saldoAnterior, $saldoAnterior, '', '']];
 
         $transactionData = $this->getTransactionData($cuenta, $saldoAnterior);
-        $balanceRow = [['', '', '', '', '', '', '', '', '', 'BALANCE:', $transactionData['balance'], '','',$transactionData['balance']]];
+        $balanceRow = [['', '', '', '', '', '', '', '', '','','', 'BALANCE:', $transactionData['balance'], '', '', $transactionData['balance']]];
 
         $headings = $this->getHeadings();
 
@@ -51,7 +51,7 @@ class TsReporteContableCuentaExport implements FromCollection, WithTitle, WithSt
 
     private function getHeadings()
     {
-        return ['ID', 'FECHA', 'TIPO', 'CLASE', 'CAJA REPUESTA', 'CLIENTE', 'COMPROB.', 'NRO', 'MOTIVO', 'DESCRIPCION', 'MOVIMIENTOS', 'DEBE', 'HABER', 'SALDOS'];
+        return ['ID', 'FECHA', 'TIPO', 'CLASE', 'CAJA REPUESTA', 'SOCIEDAD','CLIENTE(S)', 'RUC', 'COMPROB.', 'NRO', 'MOTIVO', 'DESCRIPCION', 'MOVIMIENTOS', 'DEBE', 'HABER', 'SALDOS'];
     }
 
     private function getTransactionData($cuenta, $saldoAnterior)
@@ -100,7 +100,7 @@ class TsReporteContableCuentaExport implements FromCollection, WithTitle, WithSt
         if ($this->desde && $this->hasta) {
             $query->whereBetween('fecha', [$desdeDate, $hastaDate]);
         }
-       
+
 
         return $query->get()->map(function ($item) {
             return [
@@ -109,7 +109,9 @@ class TsReporteContableCuentaExport implements FromCollection, WithTitle, WithSt
                 'tipo' => 'INGRESO',
                 'clase' => '-',
                 'caja_repuesta' => '-',
+                'sociedad' => '-',
                 'cliente' => '-',
+                'ruc' => '-',
                 'comprob' => $item->tipocomprobante ? strtoupper($item->tipocomprobante->nombre) : '-',
                 'nro' => $item->comprobante_correlativo ? strtoupper($item->comprobante_correlativo) : '-',
                 'motivo' => $item->motivo ? strtoupper($item->motivo->nombre) : '-',
@@ -126,19 +128,27 @@ class TsReporteContableCuentaExport implements FromCollection, WithTitle, WithSt
         $desdeDate = Carbon::parse($this->desde)->startOfDay();
         $hastaDate = Carbon::parse($this->hasta)->endOfDay();
 
-
         if ($this->desde && $this->hasta) {
             $query->whereBetween('fecha', [$desdeDate, $hastaDate]);
         }
-       
+
         return $query->get()->map(function ($item) {
+            $sociedad = $item->adelanto ? $item->adelanto->sociedad : null;
+            $clientesNombres = '-';
+            $clientesRucs = '-';
+            if ($sociedad && $sociedad->clientes->count()) {
+                $clientesNombres = strtoupper($sociedad->clientes->pluck('nombre')->join(', '));
+                $clientesRucs     = strtoupper($sociedad->clientes->pluck('documento')->join(', '));
+            }
             return [
                 'id' => $item->id,
                 'fecha' => $item->fecha->format('d/m/Y'),
                 'tipo' => 'EGRESO',
                 'clase' => $item->reposicioncaja ? 'REPOSICION' : ($item->liquidacion ? 'LIQUIDACION' : ($item->adelanto ? 'ADELANTO' : '-')),
                 'caja_repuesta' => $item->reposicioncaja ? strtoupper($item->reposicioncaja->caja->nombre) : '-',
-                'cliente' => $item->adelanto ? strtoupper($item->adelanto->sociedad->nombre) : '-',
+                'sociedad' => $item->adelanto ? strtoupper($item->adelanto->sociedad->nombre) : '-',
+                'cliente' => $clientesNombres,
+                'ruc' => $clientesRucs,
                 'comprob' => $item->tipocomprobante ? strtoupper($item->tipocomprobante->nombre) : '-',
                 'nro' => $item->comprobante_correlativo ? strtoupper($item->comprobante_correlativo) : '-',
                 'motivo' => $item->motivo ? strtoupper($item->motivo->nombre) : '-',
@@ -182,7 +192,7 @@ class TsReporteContableCuentaExport implements FromCollection, WithTitle, WithSt
 
 
 
-        
+
         $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(15); // Title row styling
         $sheet->getStyle('A1')->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
         $sheet->getStyle('A1')->getFill()->getStartColor()->setARGB('D9E7DC'); // Set background color
@@ -195,7 +205,7 @@ class TsReporteContableCuentaExport implements FromCollection, WithTitle, WithSt
         }
 
 
-        
+
         $sheet->mergeCells('A1:G1'); // Merging for the main title
         $sheet->mergeCells('A2:B2'); // Merging for "Información general"
         $sheet->mergeCells('A3:B3'); // Merging for "Información general"
@@ -219,7 +229,7 @@ class TsReporteContableCuentaExport implements FromCollection, WithTitle, WithSt
         $sheet->getColumnDimension('N')->setWidth(13);
 
 
-        
+
         $sheet->getStyle('E7:E500')->getAlignment()->setWrapText(true);
         $sheet->getStyle('F7:F500')->getAlignment()->setWrapText(true);
         $sheet->getStyle('A1:Z500')->getAlignment()->setWrapText(true);

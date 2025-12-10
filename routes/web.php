@@ -35,12 +35,20 @@ use App\Http\Controllers\InvherramientasController;
 use App\Http\Controllers\PesoController;
 use App\Http\Controllers\PosicionController;
 use App\Http\Controllers\EmpleadoController;
+use App\Http\Controllers\LiquidacionesController;
+use App\Http\Controllers\LoteController;
 use App\Http\Controllers\LqAdelantoController;
 use App\Http\Controllers\LqClienteController;
 use App\Http\Controllers\LqDevolucionController;
 use App\Http\Controllers\LqSociedadController;
+use App\Http\Controllers\MoliendaController;
 use App\Http\Controllers\OrdenServicioController;
 use App\Http\Controllers\PersonaController;
+use App\Http\Controllers\PesoOtraBalController;
+use App\Http\Controllers\PlProgramacionController;
+use App\Http\Controllers\ProcesoController;
+use App\Http\Controllers\ReactivoController;
+use App\Http\Controllers\ReactivoDetalleController;
 use App\Http\Controllers\TsBancoController;
 use App\Http\Controllers\TscajaController;
 use App\Http\Controllers\TsCuentaController;
@@ -66,6 +74,7 @@ Route::group(['middleware' => ['auth']], function () {
 
     Route::get('roles/{roleId}/give-permissions', [RoleController::class, 'addPermissionToRole']);
     Route::put('roles/{roleId}/give-permissions', [RoleController::class, 'givePermissionToRole']);
+    Route::get('/productos/filter', [ProductoController::class, 'filter'])->name('productos.filter');
 
     Route::resource('users', UserController::class);
     Route::get('users/{userId}/delete', [UserController::class, 'destroy']);
@@ -176,13 +185,12 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('export-excel-reportescuentas', [TsReporteDiarioCuentasController::class, 'export_excel'])->name('tsreportescuentas.export-excel');
     Route::get('export-contable-excel-reportescuentas', [TsReporteDiarioCuentasController::class, 'export_excel_contable'])->name('tsreporteContablecuentas.export-excel');
 
+
     //ANULAR ROUTES
     Route::get('/inventarioingresos/{id}/anular', [InventarioingresoController::class, 'anular'])->name('inventarioingresos.anular');
     Route::get('/invsalidasrapidas/{id}/anular', [InvsalidasrapidasController::class, 'anular'])->name('invsalidasrapidas.anular');
     Route::get('/invingresosrapidos/{id}/anular', [InvingresosrapidosController::class, 'anular'])->name('invingresosrapidos.anular');
     Route::get('/inventarioprestamoingreso/{id}/anular', [InventarioprestamoingresoController::class, 'anular'])->name('inventarioprestamoingreso.anular');
-
-    //FOR AJAX
 
     //FOR SUNAT API
     Route::get('/findPersona', [RanchoController::class, 'get_persona'])->name('findPersona');
@@ -209,7 +217,11 @@ Route::group(['middleware' => ['auth']], function () {
         ->name('search.tsreportescuentas');
     Route::get('/search-tssalidascuentas', [TsSalidacuentaController::class, 'searchSalidaCuenta'])->name('search.salidascuentas');
     Route::get('/search-tsingresoscuentas', [TsIngresoCuentaController::class, 'searchIngresosCuentas'])->name('search.ingresoscuentas');
-    Route::get('/search-salidasmiscajas', [TsMicajaController::class, 'searchSalidasMisCajas'])->name(name: 'search.salidasmiscajas');
+    Route::get('/search-salidasmiscajas', [TsMicajaController::class, 'searchSalidasMisCajas'])->name('search.salidasmiscajas');
+    //AQUI ESTÁ LA CORRECION DE INGRESOS RAPIDOS
+
+    Route::get('/search-ingreso-rapido', [InvingresosrapidosController::class, 'buscar'])
+        ->name('invingresosrapidos.buscar');
 
     //FIND DOCUMENTO BY PERSONA AJAX
     Route::get('/search-documento-persona-by-name', [PersonaController::class, 'searchPersonaDocumento'])->name('autocompdoc.persona');
@@ -265,10 +277,84 @@ Route::group(['middleware' => ['auth']], function () {
         ->name('search.ordenservicio');
     Route::get('/orden-servicio/{id}/print', [OrdenServicioController::class, 'print'])->name('orden-servicio.print');
     Route::get('/orden-servicio/{id}/comprobante', [OrdenServicioController::class, 'comprobante'])->name('orden-servicio.comprobante');
-
     Route::post('/orden-servicio/{id}/cancelar', [OrdenServicioController::class, 'cancelar'])->name('orden-servicio.cancelar');
     Route::post('/orden-servicio/{id}/proceso', [OrdenServicioController::class, 'proceso'])->name('orden-servicio.proceso');
     Route::post('/orden-servicio/{id}/finalizar', [OrdenServicioController::class, 'finalizar'])->name('orden-servicio.finalizar');
+
+    //reactivo 
+    Route::post('/reactivos', [ReactivoController::class, 'store'])->name('reactivos.store');
+    Route::get('/reactivos', [ReactivoController::class, 'index'])->name('reactivos');
+    Route::get('/reactivos/stock', [ReactivoController::class, 'stock'])->name('reactivos.stock');
+    Route::post('/reactivosdetalles', [ReactivoDetalleController::class, 'store'])->name('reactivosdetalles.store');
+    Route::delete('/reactivos/destroy', [ReactivoController::class, 'destroy'])->name('reactivos.destroy');
+    Route::delete('/reactivosdetalles/destroy', [ReactivoDetalleController::class, 'destroy'])->name('reactivosdetalles.destroy');
+    Route::post('/reactivos-stock/reset/{circuito}', [ReactivoController::class, 'reset_stock'])
+        ->name('reactivos.reset');
+
+
+    //lotes
+    Route::post('/lotes', [LoteController::class, 'store'])->name('lotes.store');
+    Route::get('/lotes', [LoteController::class, 'index'])->name('lotes');
+    Route::put('/lotes/{id}', [LoteController::class, 'update'])->name('lotes.update');
+    Route::delete('/lotes/destroy', [LoteController::class, 'destroy'])->name('lotes.destroy');
+    Route::get('/lotes/buscar', [LoteController::class, 'buscar'])->name('lotes.buscar');
+    Route::get('/lotes/{id}/pesos', [LoteController::class, 'pesosEnCancha'])->name('lotes.pesos');
+
+    //procesos
+    Route::get('/procesos', [ProcesoController::class, 'index'])->name('procesos');
+    Route::get('/procesos/{id}/edit', [ProcesoController::class, 'edit'])->name('procesos.edit');
+    Route::post('/procesos', [ProcesoController::class, 'store'])->name('procesos.store');
+    Route::get('/procesos/{id}/eliminar', [ProcesoController::class, 'destroy'])->name('procesos.delete');
+    Route::post('/reactivo/consumo', [ProcesoController::class, 'guardar_consumo'])->name('reactivo.consumo');
+    Route::put('/reactivo/consumo/{id}', [ProcesoController::class, 'actualizar_consumo'])->name('reactivo.consumo.update');
+    Route::post('/reactivo/devolucion', [ProcesoController::class, 'guardar_devolucion'])->name('reactivo.devolucion');
+    Route::put('/reactivo/devolucion/{id}', [ProcesoController::class, 'actualizar_devolucion'])->name('reactivo.devolucion.update');
+    Route::put('/procesos/{id}/finalizar', [ProcesoController::class, 'finalizar'])
+        ->name('proceso.finalizar');
+
+    Route::get('/molienda', [MoliendaController::class, 'index'])->name('molienda');
+    Route::post('/molienda/liquidar', [MoliendaController::class, 'guardar_liquidacion'])->name('molienda.guardar_liquidacion');
+    Route::get('/molienda-liquidacion/{id}', [MoliendaController::class, 'liquidar'])->name('molienda.liquidar');
+    Route::get('/molienda/{id}/pesos', [MoliendaController::class, 'pesosByProceso']);
+    Route::get('/molienda/{id}/tiempos', [MoliendaController::class, 'getTiempos']);
+    Route::get('/molienda/{id}/edit', [MoliendaController::class, 'edit'])->name('molienda.edit');
+    Route::post('/molienda', [MoliendaController::class, 'store'])->name('molienda.store');
+    Route::post('/molienda/{id}/guardar-tiempo', [MoliendaController::class, 'guardar_tiempo'])->name('molienda.guardar-tiempo');
+    Route::get('/molienda/{id}/eliminar', [MoliendaController::class, 'destroy'])->name('molienda.delete');
+    Route::put('/molienda/{id}/finalizar', [MoliendaController::class, 'finalizar'])
+        ->name('molieda.finalizar');
+    Route::get('/molienda/{id}/imprimir', [MoliendaController::class, 'imprimir'])
+        ->name('molienda.imprimir');
+
+
+
+    //Liquidaciones
+    Route::get('/liquidaciones', [LiquidacionesController::class, 'index'])->name('liquidaciones');
+    Route::get('/liquidaciones/create/{proceso}', [LiquidacionesController::class, 'liquidar'])->name('liquidaciones.create');
+    Route::post('/liquidaciones/guardar', [LiquidacionesController::class, 'store'])->name('liquidaciones.store');
+    Route::get('/liquidaciones/{id}/print', [LiquidacionesController::class, 'print'])->name('liquidaciones.print');
+
+
+    //pesos
+    Route::get('/pesos', [PesoController::class, 'index'])->name('pesos.index');
+    Route::post('/pesos', [PesoController::class, 'pesos'])->name('pesos');
+    Route::put('/pesos-update/{id}', [PesoController::class, 'update'])->name('pesos.update');
+    Route::post('/pesos/mass-update', [PesoController::class, 'massUpdate'])
+        ->name('pesos.massUpdate');
+
+
+    Route::prefix('programaciones')->group(function () {
+        Route::get('/', [PlProgramacionController::class, 'index'])->name('programaciones.index');
+        Route::post('/', [PlProgramacionController::class, 'store'])->name('programaciones.store');
+        Route::put('/{id}', [PlProgramacionController::class, 'update'])->name('programaciones.update');
+        Route::delete('/{id}', [PlProgramacionController::class, 'destroy'])->name('programaciones.destroy');
+        Route::get('/{id}/pesos', [PesoController::class, 'pesosByProgramacion']);
+        Route::get('/{id}/pesos', [PlProgramacionController::class, 'datatable']);
+    });
+
+    Route::post('/otras-balanza/{id}', [PesoOtraBalController::class, 'store'])->name('otrasBalanza.store');
+    Route::post('/otras-balanza/{id}/molienda', [PesoOtraBalController::class, 'guardar_molienda'])->name('otrasBalanza.guardar_molienda');
+    Route::delete('/otras-balanza/{id}', [PesoOtraBalController::class, 'destroy'])->name('otrasBalanza.destroy');
 });
 
 Route::get('/', function () {

@@ -12,7 +12,6 @@ class LqSociedadController extends Controller
     public function __construct()
     {
         $this->middleware('permission:use cuenta');
-
     }
 
     /**
@@ -25,7 +24,6 @@ class LqSociedadController extends Controller
         $sociedadesclientes = LqSociedadCliente::orderBy('created_at', 'desc')->paginate(20);
 
         return view('liquidaciones.sociedades.index', compact('sociedades', 'clientes', 'sociedadesclientes'));
-        
     }
 
     /**
@@ -40,51 +38,50 @@ class LqSociedadController extends Controller
      * Store a newly created resource in storage.
      */
     public function store(Request $request)
-{
-    try {
-        // Validate the request data
-        $request->validate([
-            'codigo' => 'required|unique:lq_sociedades,codigo',
-            'nombre' => 'required|unique:lq_sociedades,nombre',
-        ]);
+    {
+        try {
+            // Validate the request data
+            $request->validate([
+                'codigo' => 'required|unique:lq_sociedades,codigo',
+                'nombre' => 'required|unique:lq_sociedades,nombre',
+            ]);
 
-        // Create the society
-        $sociedad = LqSociedad::create([
-            'codigo' => $request->codigo,
-            'nombre' => $request->nombre,
-            'creador_id' => auth()->id(),
-        ]);
+            // Create the society
+            $sociedad = LqSociedad::create([
+                'codigo' => $request->codigo,
+                'nombre' => $request->nombre,
+                'creador_id' => auth()->id(),
+            ]);
 
-        // Handle client relationships
-        if ($request->filled('clientes')) {
-            $clientes = $request->input('clientes');
+            // Handle client relationships
+            if ($request->filled('clientes')) {
+                $clientes = $request->input('clientes');
 
-            // Create society-client relationships
-            foreach ($clientes as $clienteId) {
-                if (!empty($clienteId)) { // Ensure clienteId is not null or empty
-                    LqSociedadCliente::create([
-                        'sociedad_id' => $sociedad->id,
-                        'cliente_id' => $clienteId,
-                        'creador_id' => auth()->id(),
-                    ]);
-                } else {
-                    // Log a warning for empty cliente_id
-                    \Log::warning('Received empty cliente_id for sociedad_id: ' . $sociedad->id);
+                // Create society-client relationships
+                foreach ($clientes as $clienteId) {
+                    if (!empty($clienteId)) { // Ensure clienteId is not null or empty
+                        LqSociedadCliente::create([
+                            'sociedad_id' => $sociedad->id,
+                            'cliente_id' => $clienteId,
+                            'creador_id' => auth()->id(),
+                        ]);
+                    } else {
+                        // Log a warning for empty cliente_id
+                        \Log::warning('Received empty cliente_id for sociedad_id: ' . $sociedad->id);
+                    }
                 }
             }
+
+            // Redirect to a relevant page with success message
+            return redirect()->route('lqsociedades.index')->with('status', 'Sociedad creada con éxito.');
+        } catch (ValidationException $e) {
+            // Handle validation errors
+            return back()->withInput()->withErrors($e->validator->errors())->with('error', 'Error al crear la sociedad.');
+        } catch (\Exception $e) {
+            // Handle other unexpected errors
+            return back()->withInput()->with('error', 'Error al procesar la solicitud: ' . $e->getMessage());
         }
-
-        // Redirect to a relevant page with success message
-        return redirect()->route('lqsociedades.index')->with('status', 'Sociedad creada con éxito.');
-
-    } catch (ValidationException $e) {
-        // Handle validation errors
-        return back()->withInput()->withErrors($e->validator->errors())->with('error', 'Error al crear la sociedad.');
-    } catch (\Exception $e) {
-        // Handle other unexpected errors
-        return back()->withInput()->with('error', 'Error al procesar la solicitud: ' . $e->getMessage());
     }
-}
 
 
     /**
@@ -110,32 +107,46 @@ class LqSociedadController extends Controller
     {
         try {
             $request->validate([
-                
-                'nombre' => 'nullable',
-
+                'nombre' => 'required',
+                'clientes' => 'array',
+                'clientes.*' => 'nullable|exists:lq_clientes,id',
             ]);
 
             $sociedad = LqSociedad::findOrFail($id);
-            $sociedad->nombre = $request->nombre;
-            $sociedad->save();
 
+            // Actualiza datos base
+            $sociedad->update([
+                'nombre' => $request->nombre,
+            ]);
 
-            //UPDATE THE BALANCE
-            
-         
-            
+            /* =====================================================
+            🔹 ACTUALIZAR CLIENTES ASOCIADOS
+           ===================================================== */
 
-       
+            // 1. Eliminamos todos los vínculos actuales
+            LqSociedadCliente::where('sociedad_id', $sociedad->id)->delete();
 
-            return redirect()->route('lqsociedades.index')->with('status', 'Sociedad actualizada con éxito.');
-        } catch (QueryException $e) {
+            // 2. Creamos nuevamente según el formulario
+            if ($request->filled('clientes')) {
+                foreach ($request->clientes as $clienteId) {
+                    if (!empty($clienteId)) {
+                        LqSociedadCliente::create([
+                            'sociedad_id' => $sociedad->id,
+                            'cliente_id' => $clienteId,
+                            'creador_id' => auth()->id(),
+                        ]);
+                    }
+                }
+            }
 
-            return redirect()->back()->with('error', 'Error desconocido');
+            return redirect()
+                ->route('lqsociedades.index')
+                ->with('status', 'Sociedad actualizada con éxito.');
         } catch (\Exception $e) {
-
             return redirect()->back()->with('error', 'Error: ' . $e->getMessage());
         }
     }
+
 
     /**
      * Remove the specified resource from storage.
@@ -148,14 +159,8 @@ class LqSociedadController extends Controller
     public function searchSociedad(Request $request)
     {
         $sociedades = LqSociedad::where('nombre', 'like', '%' . $request->search_string . '%')
-        ->orWhere('codigo', 'like', '%' . $request->search_string . '%')
-        ->orderBy('created_at', 'desc')->get();
+            ->orWhere('codigo', 'like', '%' . $request->search_string . '%')
+            ->orderBy('created_at', 'desc')->get();
         return view('liquidaciones.sociedades.search-results', compact(var_name: 'sociedades'));
     }
-
-
-
-
-    
-
 }

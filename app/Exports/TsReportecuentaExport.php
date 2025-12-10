@@ -42,7 +42,7 @@ class TsReportecuentaExport implements FromCollection, WithTitle, WithStyles
         $reportetotal = $this->calculateReporteTotal($cuenta);
 
         $saldoAnteriorRow = [['', '', '', '', '', '', '', '', 'SALDO', 'ANTERIOR:', $saldoAnterior]];
-        $balanceRow = [['', '', '', '', '', '', '', '', '', 'BALANCE:', $reportetotal]];
+        $balanceRow = [['', '', '', '', '', '', '', '', '','','', 'BALANCE:', $reportetotal]];
 
         // Combine title, summary, headings, and main data for the export
         return (new Collection($titleData))
@@ -60,7 +60,7 @@ class TsReportecuentaExport implements FromCollection, WithTitle, WithStyles
     private function getHeadings()
     {
         return [
-            ['ID', 'FECHA', 'TIPO', 'CLASE', 'CAJA REPUESTA', 'CLIENTE', 'COMPROB.', 'NRO', 'MOTIVO', 'DESCRIPCION', 'MONTO']
+            ['ID', 'FECHA', 'TIPO', 'CLASE', 'CAJA REPUESTA', 'SOCIEDAD', 'CLIENTE(S)', 'RUC', 'COMPROB.', 'NRO', 'MOTIVO', 'DESCRIPCION', 'MONTO']
         ];
     }
 
@@ -85,7 +85,9 @@ class TsReportecuentaExport implements FromCollection, WithTitle, WithStyles
                 'tipo' => 'INGRESO',
                 'clase' => '-',
                 'caja repuesta' => '-',
+                'sociedad' => '-',
                 'cliente' => '-',
+                'ruc' => '-',
                 'tipo_compr' => $item->tipocomprobante ? strtoupper($item->tipocomprobante->nombre) : '-',
                 'nro_compr' => $item->comprobante_correlativo ? strtoupper($item->comprobante_correlativo) : '-',
                 'motivo' => $item->motivo ? strtoupper($item->motivo->nombre) : '-',
@@ -111,8 +113,13 @@ class TsReportecuentaExport implements FromCollection, WithTitle, WithStyles
 
         return $query->get()->map(function ($item) {
             $clase = '-';
-            $sociedad = '-';
-
+            $sociedad = $item->adelanto ? $item->adelanto->sociedad : null;
+            $clientesNombres = '-';
+            $clientesRucs = '-';
+            if ($sociedad && $sociedad->clientes->count()) {
+                $clientesNombres = strtoupper($sociedad->clientes->pluck('nombre')->join(', '));
+                $clientesRucs     = strtoupper($sociedad->clientes->pluck('documento')->join(', '));
+            }
             if ($item->reposicioncaja) {
                 $clase = 'REPOSICION';
             } elseif ($item->liquidacion) {
@@ -129,7 +136,9 @@ class TsReportecuentaExport implements FromCollection, WithTitle, WithStyles
                 'tipo' => 'EGRESO',
                 'clase' => $clase,
                 'reposicion_caja' => $item->reposicioncaja ? strtoupper($item->reposicioncaja->caja->nombre) : '-',
-                'sociedad' => $sociedad,
+                'sociedad' => $item->adelanto ? strtoupper($item->adelanto->sociedad->nombre) : '-',
+                'cliente' => $clientesNombres,
+                'ruc' => $clientesRucs,
                 'tipo_compr' => $item->tipocomprobante ? strtoupper($item->tipocomprobante->nombre) : '-',
                 'nro_compr' => $item->comprobante_correlativo ? strtoupper($item->comprobante_correlativo) : '-',
                 'motivo' => $item->motivo ? strtoupper($item->motivo->nombre) : '-',
@@ -154,7 +163,7 @@ class TsReportecuentaExport implements FromCollection, WithTitle, WithStyles
                 '',
                 $cuenta->nombre,
                 '',
-                '', 
+                '',
                 'DESDE',
                 $desdeDate->format('d/m/Y')
             ],

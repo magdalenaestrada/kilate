@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use App\Models\ProductosFamilia;
 use App\Models\Log;
 use App\Exports\ProductosExport;
+use App\Models\TipoMoneda;
 use Excel;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
@@ -31,31 +32,25 @@ class ProductoController extends Controller
      */
     public function index()
     {
-        $productos = DB::table('productos')
-            ->leftJoin('productosfamilias', 'productos.productosfamilia_id', '=', 'productosfamilias.id')  // Join productosfamilias table
-            ->leftJoin('unidades', 'productos.unidad_id', '=', 'unidades.id')  // Join unidades table
-            ->orderBy('productos.nombre_producto')
-            ->select(
-                'productos.*',
-                'productosfamilias.nombre as familia_nombre',  // Select familia name
-                'unidades.nombre as unidad_nombre',  // Select unidad name
-            )
+        $productos = Producto::with(['familia', 'unidad'])
+            ->orderBy('nombre_producto')
             ->paginate(50);
 
         $unidades = Unidad::orderBy('nombre')->get();
-
         $productosfamilias = ProductosFamilia::all();
 
         return view('productos.index', compact('productos', 'productosfamilias', 'unidades'));
     }
+
 
     /**
      * Show the form for creating a new resource.
      */
     public function create()
     {
+        $tipos_monedas = TipoMoneda::all();
         $unidades = Unidad::orderBy('nombre')->get();
-        return view('productos.create', compact('unidades'));
+        return view('productos.create', compact('unidades', "tipos_monedas"));
     }
 
     /**
@@ -80,6 +75,7 @@ class ProductoController extends Controller
             $producto->stock = 0;
             $producto->usuario = auth()->user()->name;
             $producto->unidad_id =  $request->input('unidad_id');
+            $producto->tipo_moneda_id =  $request->input('tipo_moneda_id');
 
             $producto->save();
 
@@ -93,24 +89,20 @@ class ProductoController extends Controller
         }
     }
 
-    /**
-     * Display the specified resource.
-     */
-    
-     public function show(Producto $producto)
-     {
-         // Extrae el nombre del producto para la búsqueda de imágenes
-         $query = $producto->nombre_producto;
-     
-         // Ejecuta el script Python directamente desde PHP, asumiendo que este retorna la URL
-     
-         // Retorna la vista con el producto y la URL de la imagen
-         return view('productos.show', compact('producto'));
-     }
-     
-    
-     
-     
+    public function show(Producto $producto)
+    {
+        // Extrae el nombre del producto para la búsqueda de imágenes
+        $query = $producto->nombre_producto;
+
+        // Ejecuta el script Python directamente desde PHP, asumiendo que este retorna la URL
+
+        // Retorna la vista con el producto y la URL de la imagen
+        return view('productos.show', compact('producto'));
+    }
+
+
+
+
 
 
 
@@ -122,9 +114,10 @@ class ProductoController extends Controller
         $producto = Producto::findOrFail($id);
         $productosfamilias = ProductosFamilia::all();
         $unidades = Unidad::all();
+        $tipos_monedas = TipoMoneda::all();
 
 
-        return view('productos.edit', compact('producto', 'productosfamilias', 'unidades'));
+        return view('productos.edit', compact('producto', 'productosfamilias', 'unidades', 'tipos_monedas'));
     }
 
     /**
@@ -138,6 +131,7 @@ class ProductoController extends Controller
         $producto->productosfamilia_id = $request->productosfamilia_id;
         $producto->nombre_producto = $request->nombre_producto;
         $producto->unidad_id = $request->unidad_id;
+        $producto->tipo_moneda_id = $request->tipo_moneda_id;
         if ($producto->precio == 0) {
             $producto->precio = $request->valor_promedio;
         }
@@ -186,7 +180,7 @@ class ProductoController extends Controller
             return redirect()->route('productos.index')->with('eliminar-producto', 'Producto eliminado con éxito.');
         } catch (QueryException $e) {
 
-            
+
 
 
             if ($e->getCode() == '23000') {
@@ -220,9 +214,6 @@ class ProductoController extends Controller
         return view('productos.search-results', compact('productos'));
     }
 
-
-
-
     public function dailyrotation(string $id)
     {
         // Fetch the product by ID
@@ -253,11 +244,4 @@ class ProductoController extends Controller
             'pruebas' => $pruebas,
         ]);
     }
-
-
-
-
-
-
-    
 }
