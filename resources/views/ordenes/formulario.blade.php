@@ -52,7 +52,7 @@
 
                         <div class="col-md-3">
                             <label for="fecha_fin" class="form-label">Fecha Fin</label>
-                            <input type="date" name="fecha_fin" id="fecha_fin" class="form-control">
+                            <input type="date" name="fecha_fin" id="fecha_fin" class="form-control" required>
                         </div>
                     </div>
 
@@ -79,10 +79,11 @@
                         <tbody id="tbodyServicios">
                             <tr>
                                 <td><input type="text" class="form-control descripcion"
-                                        placeholder="Descripción del servicio"></td>
-                                <td><input type="number" class="form-control cantidad" min="1" value="1"></td>
-                                <td><input type="number" class="form-control precio_unitario" step="0.01"
-                                        value="0.00"></td>
+                                        placeholder="Descripción del servicio" required></td>
+                                <td><input type="number" class="form-control cantidad" min="1" value="1"
+                                        required></td>
+                                <td><input type="number" class="form-control precio_unitario" step="0.01" value="0.00"
+                                        required></td>
                                 <td><input type="number" class="form-control subtotal" step="0.01" readonly></td>
                                 <td class="text-center">
                                     <button type="button" class="btn btn-danger btn-sm eliminar-fila">✕</button>
@@ -110,10 +111,10 @@
                         </div>
                     </div>
 
-                    
+
                     <input type="hidden" name="detalles" id="inputDetalles">
 
-                    
+
 
                     <div class="text-end">
                         <button type="submit" class="btn btn-success">Guardar Orden de Servicio</button>
@@ -156,9 +157,9 @@
         $('#agregarFila').click(function() {
             const nuevaFila = `
         <tr>
-            <td><input type="text" class="form-control descripcion" placeholder="Descripción del servicio"></td>
-            <td><input type="number" class="form-control cantidad" min="1" value="1"></td>
-            <td><input type="number" class="form-control precio_unitario" step="0.01" value="0.00"></td>
+            <td><input type="text" class="form-control descripcion" placeholder="Descripción del servicio" required></td>
+            <td><input type="number" class="form-control cantidad" min="1" value="1" required></td>
+            <td><input type="number" class="form-control precio_unitario" step="0.01" value="0.00" required></td>
             <td><input type="number" class="form-control subtotal" step="0.01" readonly></td>
             <td class="text-center"><button type="button" class="btn btn-danger btn-sm eliminar-fila">✕</button></td>
         </tr>`;
@@ -170,28 +171,52 @@
             calcularTotales();
         });
 
-        // === Serializar detalles antes de enviar ===
-        $('#formOrdenServicio').on('submit', function(e) {
-            const detalles = [];
-            $('#tbodyServicios tr').each(function() {
-                const descripcion = $(this).find('.descripcion').val();
-                const cantidad = $(this).find('.cantidad').val();
-                const precio_unitario = $(this).find('.precio_unitario').val();
-                const subtotal = $(this).find('.subtotal').val();
 
-                if (descripcion) {
-                    detalles.push({
-                        descripcion,
-                        cantidad,
-                        precio_unitario,
-                        subtotal
-                    });
+        $('#formOrdenServicio').on('submit', function(e) {
+            e.preventDefault();
+            let errores = false;
+            let mensajeError = "";
+
+            $('#tbodyServicios tr').each(function(index) {
+                let descripcion = $(this).find('.descripcion').val().trim();
+                let cantidad = $(this).find('.cantidad').val();
+                let precio = $(this).find('.precio_unitario').val();
+                let subtotal = $(this).find('.subtotal').val();
+
+                if (!descripcion || cantidad <= 0 || precio <= 0 || subtotal <= 0) {
+                    errores = true;
+                    mensajeError = `La fila ${index + 1} contiene datos incompletos o inválidos.`;
+                    return false;
                 }
             });
+
+            if (errores) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Datos incompletos',
+                    text: mensajeError,
+                    confirmButtonText: 'Entendido',
+                });
+                return;
+            }
+
+            const detalles = [];
+            $('#tbodyServicios tr').each(function() {
+                detalles.push({
+                    descripcion: $(this).find('.descripcion').val(),
+                    cantidad: $(this).find('.cantidad').val(),
+                    precio_unitario: $(this).find('.precio_unitario').val(),
+                    subtotal: $(this).find('.subtotal').val()
+                });
+            });
+
             $('#inputDetalles').val(JSON.stringify({
                 detalles
             }));
+
+            this.submit();
         });
+
 
         // === Buscar proveedor manualmente ===
         $('#buscar_proveedor_btn').click(function() {
@@ -214,7 +239,7 @@
                     } else if (response.nombres) {
                         $('#proveedor').val(
                             `${response.nombres} ${response.apellidoPaterno} ${response.apellidoMaterno}`
-                            );
+                        );
                     }
 
                     // 🔹 NO se limpia el RUC, solo completamos si falta

@@ -317,7 +317,6 @@ return [
             'can' => 'manage-blog',
 
         ],
-
         [
             'text' => 'Dashboard',
             'route' => 'home',

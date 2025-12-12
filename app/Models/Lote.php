@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Lote extends Model
 {
     protected $table = 'lotes';
-    protected $fillable = ['codigo', 'nombre', 'activo', 'lq_cliente_id'];
+    protected $fillable = ['codigo', 'nombre', 'activo', 'lq_cliente_id', 'usuario_id'];
 
 
     public function pesos()

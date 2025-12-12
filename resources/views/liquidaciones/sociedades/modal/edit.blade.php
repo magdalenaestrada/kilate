@@ -102,8 +102,6 @@
                                 @endforelse
                             </tbody>
                         </table>
-
-
                         <div class="col-md-12 text-right g-3 mt-2">
                             <button type="submit" class="btn btn-secondary btn-sm">
                                 {{ __('Guardar') }}

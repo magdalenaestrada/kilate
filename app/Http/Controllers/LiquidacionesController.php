@@ -23,6 +23,7 @@ class LiquidacionesController extends Controller
                 $q->where('estado', 'F')
                     ->orWhere('estado', 'L');
             })
+            ->where('molienda', false)
             ->select('procesos.*')
             ->paginate(100);
 
@@ -96,6 +97,7 @@ class LiquidacionesController extends Controller
             'suma_proceso' => $request->suma_proceso,
             'suma_exceso_reactivos' => $request->suma_exceso_reactivos,
             'suma_balanza' => $request->suma_balanza,
+            'user_id' => $user,
             'suma_comedor' => $request->suma_comedor,
             'suma_laboratorio' => $request->suma_laboratorio,
             'suma_prueba_metalurgica' => $request->suma_prueba_metalurgica,

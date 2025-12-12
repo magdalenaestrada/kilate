@@ -368,7 +368,7 @@
 
             </p>
 
-            <p><strong>Facilitador: {{ $liquidacion->user->empleado->nombre ?? "" }}</strong></p>
+            <p><strong>Facilitador: {{ $liquidacion->user->name ?? "" }}</strong></p>
         </div>
 
         <div style="width: 50%;">

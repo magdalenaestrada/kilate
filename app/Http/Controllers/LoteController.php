@@ -37,6 +37,7 @@ class LoteController extends Controller
                 "lq_cliente_id" => $request->lq_cliente_id,
                 'codigo' => strtoupper($request->codigo),
                 'nombre' => strtoupper($request->nombre),
+                'usuario_id' => auth()->id(),
             ]);
 
             return response()->json([

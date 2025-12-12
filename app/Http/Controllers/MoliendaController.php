@@ -403,11 +403,12 @@ class MoliendaController extends Controller
     {
         $lote = Lote::findOrFail($request->lote_id);
         $numero = Proceso::where("lote_id", $lote->id)
+            ->where("molienda", true)
             ->lockForUpdate()
             ->count();
 
         $nuevo = $numero + 1;
 
-        return $lote->codigo . '.' . $nuevo;
+        return 'M-' . $lote->codigo . '.' . $nuevo;
     }
 }

@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="utf-8">
-    <title>Orden de compra {{ $orden->codigo }}</title>
+    <title>Orden de servicio {{ $orden->codigo }}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <style>
         :root {
@@ -220,7 +220,7 @@
                     de {{ \Illuminate\Support\Str::ucfirst($orden->created_at->translatedFormat('F')) }}
                     del {{ $orden->created_at->year }}</div>
             </div>
-            <h3 class="doc-title">ORDEN DE COMPRA</h3>
+            <h3 class="doc-title">ORDEN DE SERVICIO</h3>
         </div>
 
         <hr>
@@ -306,12 +306,12 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach ($orden->detalles as $producto)
+                    @foreach ($orden->detalles as $detalle)
                         <tr>
-                            <td>{{ $producto->nombre_producto }}</td>
-                            <td class="text-center">{{ number_format($producto->cantidad, 0) }}</td>
-                            <td class="text-right">{{ number_format($producto->precio_unitario, 2) }}</td>
-                            <td class="text-right">{{ number_format($producto->subtotal, 2) }}</td>
+                            <td>{{ $detalle->descripcion }}</td>
+                            <td class="text-center">{{ number_format($detalle->cantidad, 0) }}</td>
+                            <td class="text-right">{{ number_format($detalle->precio_unitario, 2) }}</td>
+                            <td class="text-right">{{ number_format($detalle->subtotal, 2) }}</td>
                         </tr>
                     @endforeach
                     <tr>

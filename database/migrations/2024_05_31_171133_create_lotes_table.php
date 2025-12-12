@@ -13,10 +13,10 @@ return new class extends Migration
     {
         Schema::create('lotes', function (Blueprint $table) {
             $table->id();
-            $table->string('generado')->unique();
-            $table->string('codigo')->unique();
+            $table->string('codigo');
             $table->string('nombre')->unique();
             $table->boolean('activo')->default(true);
+            $table->foreignId('usuario_id')->constrained('users')->onDelete('cascade');
             $table->timestamps();
         });
     }

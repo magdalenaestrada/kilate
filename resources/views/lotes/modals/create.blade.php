@@ -18,8 +18,8 @@
                     </div>
                     <div class="combo form-group">
                         <label>Cliente</label>
-                        <input type="text" class="clienteInput form-control" placeholder="Escriba para buscar...">
-                        <select class="clienteSelect form-control" size="5" style="display: none;">
+                        <input type="text" class="clienteInput form-control" placeholder="Escriba para buscar..." required>
+                        <select class="clienteSelect form-control" size="5" style="display: none;" >
                             @foreach ($clientes as $cliente)
                                 <option data-lotes="{{ $cliente->lotes_count }}" value="{{ $cliente->id }}">
                                     {{ $cliente->codigo }} - {{ $cliente->nombre }}</option>

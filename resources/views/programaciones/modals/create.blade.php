@@ -133,7 +133,7 @@
                               </div>
                               <div class="col-md-2">
                                   <label class="form-label fw-semibold">Fecha salida</label>
-                                  <input type="datetime-local" class="form-control" id="fechas" name="fechas" max="{{ $hoy }}"
+                                  <input type="datetime-local" class="form-control" id="fechas" name="fechas"
                                       value="{{ $hoy }}">
                               </div>
                               <div class="col-md-8">

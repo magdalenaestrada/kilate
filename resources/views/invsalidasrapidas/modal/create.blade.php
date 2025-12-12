@@ -64,7 +64,8 @@
 
                                     <td>
                                         <input name="qty[]" type="number" required
-                                            class="form-control form-control-sm product-qty" placeholder="0.0" step="0.1">
+                                            class="form-control form-control-sm product-qty" placeholder="0.0"
+                                            step="0.1">
                                     </td>
                                     <td>
                                         <input name="unidad[]" required

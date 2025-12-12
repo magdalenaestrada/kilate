@@ -42,7 +42,6 @@ class InventarioingresoController extends Controller
     public function create()
     {
         $productos = Producto::all();
-        $tipos_monedas = TipoMoneda::all();
         return view('inventarioingresos.create', compact('productos', 'tipos_monedas'));
     }
 

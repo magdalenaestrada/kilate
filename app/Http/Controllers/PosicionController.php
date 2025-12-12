@@ -15,9 +15,7 @@ class PosicionController extends Controller
 
     }
 
-    /**
-     * Display a listing of the resource.
-     */
+
     public function index()
     {
         $posiciones = Posicion::orderBy('created_at', 'desc')->paginate(30);

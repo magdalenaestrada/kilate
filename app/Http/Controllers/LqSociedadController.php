@@ -34,9 +34,6 @@ class LqSociedadController extends Controller
         //
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
         try {
@@ -66,13 +63,11 @@ class LqSociedadController extends Controller
                             'creador_id' => auth()->id(),
                         ]);
                     } else {
-                        // Log a warning for empty cliente_id
                         \Log::warning('Received empty cliente_id for sociedad_id: ' . $sociedad->id);
                     }
                 }
             }
 
-            // Redirect to a relevant page with success message
             return redirect()->route('lqsociedades.index')->with('status', 'Sociedad creada con éxito.');
         } catch (ValidationException $e) {
             // Handle validation errors
@@ -83,26 +78,16 @@ class LqSociedadController extends Controller
         }
     }
 
-
-    /**
-     * Display the specified resource.
-     */
     public function show(string $id)
     {
         //
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit(string $id)
     {
         //
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, string $id)
     {
         try {
@@ -114,19 +99,12 @@ class LqSociedadController extends Controller
 
             $sociedad = LqSociedad::findOrFail($id);
 
-            // Actualiza datos base
             $sociedad->update([
                 'nombre' => $request->nombre,
             ]);
 
-            /* =====================================================
-            🔹 ACTUALIZAR CLIENTES ASOCIADOS
-           ===================================================== */
-
-            // 1. Eliminamos todos los vínculos actuales
             LqSociedadCliente::where('sociedad_id', $sociedad->id)->delete();
 
-            // 2. Creamos nuevamente según el formulario
             if ($request->filled('clientes')) {
                 foreach ($request->clientes as $clienteId) {
                     if (!empty($clienteId)) {
@@ -146,15 +124,7 @@ class LqSociedadController extends Controller
             return redirect()->back()->with('error', 'Error: ' . $e->getMessage());
         }
     }
-
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
-    }
+    public function destroy(string $id) {}
 
     public function searchSociedad(Request $request)
     {

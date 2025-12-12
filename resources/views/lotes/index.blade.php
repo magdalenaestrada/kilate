@@ -366,10 +366,6 @@
                 $('#nombre').val('');
                 $('#cliente_id').val('').trigger('change');
             });
-
-
-
-
         });
 
         document.getElementById('clienteSelect').addEventListener('change', function() {

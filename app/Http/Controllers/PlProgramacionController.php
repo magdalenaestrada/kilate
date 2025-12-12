@@ -251,11 +251,12 @@ class PlProgramacionController extends Controller
     {
         $lote = Lote::findOrFail($request->lote_id);
         $numero = Proceso::where("lote_id", $lote->id)
+            ->where("molienda", false)
             ->lockForUpdate()
             ->count();
 
         $nuevo = $numero + 1;
 
-        return $lote->codigo . '.' . $nuevo;
+        return 'P-' . $lote->codigo . '.' . $nuevo;
     }
 }
