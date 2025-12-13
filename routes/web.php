@@ -118,10 +118,10 @@ Route::group(['middleware' => ['auth']], function () {
     Route::resource('tsmiscajas', TsMicajaController::class);
     Route::resource('lqclientes', LqClienteController::class);
     Route::resource('lqsociedades', LqSociedadController::class);
-    Route::resource('lqadelantos', controller: LqAdelantoController::class);
-    Route::resource('tscuentasreportesdiarios', controller: TsReporteDiarioCuentasController::class);
-    Route::resource('lqliquidaciones', controller: LqLiquidacionController::class);
-    Route::resource('lqdevoluciones', controller: LqDevolucionController::class);
+    Route::resource('lqadelantos', LqAdelantoController::class);
+    Route::resource('tscuentasreportesdiarios', TsReporteDiarioCuentasController::class);
+    Route::resource('lqliquidaciones', LqLiquidacionController::class);
+    Route::resource('lqdevoluciones', LqDevolucionController::class);
 
     Route::get('tscuentasreportesdiarios/{id}/filter', [TsReporteDiarioCuentasController::class, 'filter'])->name('tscuentasreportesdiarios.filter');
 
@@ -135,6 +135,12 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/programacion/{id}/createrequerimiento', [ProgramacionController::class, 'createRequerimiento'])->name('programacion.createrequerimiento');
     Route::post('/programacion/{id}/storerequerimiento', [ProgramacionController::class, 'storeRequerimiento'])->name('programacion.storerequerimiento');
     Route::delete('/programacion/{programacion}/productos/{producto}/pivot/{pivotId}', [ProgramacionController::class, 'destroyrequerimiento'])->name('programacion.destroyrequerimiento');
+
+    Route::delete(
+        '/inventarioingresos/detalle/{detalle}',
+        [InventarioingresoController::class, 'eliminarDetalle']
+    )
+        ->name('inventarioingresos.eliminarDetalle');
 
     Route::get('/inventarioingresos/{id}/cancelar', [InventarioingresoController::class, 'cancelar'])->name('inventarioingresos.cancelar');
     Route::put('/inventarioingresos/{id}/updatecancelar', [InventarioingresoController::class, 'updatecancelar'])->name('inventarioingresos.updatecancelar');
@@ -241,7 +247,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/search-representantead-by-nombre', [LqAdelantoController::class, 'findRepresentante'])->name('autocomp.representadelanto');
 
     //FIND REPRESENTANTE LIQUIDACIÓN BY NOMBRE REPRESENTANTE AJAX
-    Route::get('/search-representantelq-by-nombre', [LqLiquidacionController::class, 'findRepresentante'])->name(name: 'autocomp.representliquidacion');
+    Route::get('/search-representantelq-by-nombre', [LqLiquidacionController::class, 'findRepresentante'])->name('autocomp.representliquidacion');
 
     //FOR AJAX GET ADELANTOS
     Route::get('/get-adelantos-by-sociedad', [LqLiquidacionController::class, 'getAdelantos'])->name('get.adelantos.by.sociedad');

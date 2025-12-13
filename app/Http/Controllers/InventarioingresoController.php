@@ -42,6 +42,7 @@ class InventarioingresoController extends Controller
     public function create()
     {
         $productos = Producto::all();
+        $tipos_monedas = TipoMoneda::all();
         return view('inventarioingresos.create', compact('productos', 'tipos_monedas'));
     }
 
@@ -629,5 +630,39 @@ class InventarioingresoController extends Controller
             ->paginate(100);
 
         return view('inventarioingresos.search-results', compact('inventarioingresos'));
+    }
+
+    public function eliminarDetalle($detalleId)
+    {
+        try {
+            $detalle = Detalleinventarioingreso::findOrFail($detalleId);
+
+            $inventarioingresoId = $detalle->inventarioingreso_id;
+
+            $detalle->delete();
+
+            $inventarioingreso = Inventarioingreso::findOrFail($inventarioingresoId);
+            $detalles = $inventarioingreso->productos;
+
+            $nuevoSubtotal = $detalles->sum('pivot.subtotal');
+            $nuevoTotal = $nuevoSubtotal * 1.18; 
+
+            $inventarioingreso->update([
+                'subtotal' => $nuevoSubtotal,
+                'total' => $nuevoTotal
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Producto eliminado correctamente',
+                'subtotal' => $nuevoSubtotal,
+                'total' => $nuevoTotal
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al eliminar el producto: ' . $e->getMessage()
+            ], 500);
+        }
     }
 }

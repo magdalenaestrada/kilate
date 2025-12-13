@@ -1,6 +1,8 @@
 @extends('admin.layout')
 
 @section('content')
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+
     <div class="container">
         <br>
         <div class="row justify-content-center">
@@ -125,6 +127,7 @@
                                             <th>{{ __('Subtotal') }}</th>
                                             <th>{{ __('Estado Detalle') }}</th>
                                             <th>{{ __('Guía Ingreso') }}</th>
+                                            <th>{{ __('Acciones') }}</th>
                                         </tr>
                                     </thead>
                                     <tbody style="font-size:13px;">
@@ -167,6 +170,13 @@
                                                     </span>
                                                 </td>
                                                 <td>{{ $prod->pivot->guiaingresoalmacen }}</td>
+                                                <td>
+                                                    <button type="button" class="btn btn-sm btn-danger btn-eliminar"
+                                                        data-detalle-id="{{ $prod->pivot->id }}"
+                                                        data-producto-nombre="{{ $prod->nombre_producto }}"
+                                                        @if ($ingresada > 0) disabled @endif> Eliminar
+
+                                                </td>
                                             </tr>
                                         @empty
                                             <tr>
@@ -192,3 +202,149 @@
         </div>
     </div>
 @stop
+
+
+@section('js')
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+
+            const botones = document.querySelectorAll('.btn-eliminar');
+
+            botones.forEach((button, index) => {
+
+
+                button.addEventListener('click', function() {
+
+                    const detalleId = this.dataset.detalleId;
+                    const productoNombre = this.dataset.productoNombre;
+                    const fila = this.closest('tr');
+
+                    const totalProductos = document.querySelectorAll('tbody tr').length;
+
+                    if (totalProductos <= 1) {
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'No permitido',
+                            text: 'No puedes dejar esta orden de compra vacía'
+                        });
+                        return;
+                    }
+
+
+                    Swal.fire({
+                        title: '¿Estás seguro?',
+                        text: `¿Deseas eliminar "${productoNombre}" de esta orden?`,
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#d33',
+                        cancelButtonColor: '#3085d6',
+                        confirmButtonText: 'Sí, eliminar',
+                        cancelButtonText: 'Cancelar'
+                    }).then((result) => {
+
+                        if (result.isConfirmed) {
+
+                            Swal.fire({
+                                title: 'Eliminando...',
+                                text: 'Por favor espera',
+                                allowOutsideClick: false,
+                                didOpen: () => {
+                                    Swal.showLoading();
+                                }
+                            });
+
+                            const url = "{{ url('inventarioingresos/detalle') }}/" +
+                                detalleId;
+
+                            const csrfToken = document.querySelector(
+                                    'meta[name="csrf-token"]')?.content ||
+                                '{{ csrf_token() }}';
+
+                            fetch(url, {
+                                    method: 'DELETE',
+                                    headers: {
+                                        'Content-Type': 'application/json',
+                                        'X-CSRF-TOKEN': csrfToken,
+                                        'Accept': 'application/json'
+                                    }
+                                })
+                                .then(response => {
+
+
+                                    if (!response.ok) {
+                                        throw new Error(
+                                            'Error en la respuesta del servidor: ' +
+                                            response.status);
+                                    }
+                                    return response.json();
+                                })
+                                .then(data => {
+
+                                    if (data.success) {
+                                        fila.style.transition = 'opacity 0.3s';
+                                        fila.style.opacity = '0';
+
+                                        setTimeout(() => {
+                                            fila.remove();
+
+
+                                            if (data.subtotal !== undefined) {
+                                                const simbolo =
+                                                    '{{ $simbolo }}';
+                                                document.querySelector(
+                                                        '.h6.mb-1')
+                                                    .textContent =
+                                                    `SUBTOTAL: ${simbolo} ${parseFloat(data.subtotal).toFixed(2)}`;
+                                                document.querySelector('.h5')
+                                                    .textContent =
+                                                    `TOTAL: ${simbolo} ${parseFloat(data.total).toFixed(2)}`;
+
+                                            }
+
+                                            document.querySelectorAll(
+                                                'tbody tr').forEach((tr,
+                                                index) => {
+                                                const firstTd = tr
+                                                    .querySelector(
+                                                        'td:first-child'
+                                                    );
+                                                if (firstTd) firstTd
+                                                    .textContent =
+                                                    index + 1;
+                                            });
+
+                                            Swal.fire({
+                                                icon: 'success',
+                                                title: '¡Eliminado!',
+                                                text: data.message ||
+                                                    'El producto ha sido eliminado correctamente',
+                                                timer: 2000,
+                                                showConfirmButton: false
+                                            });
+                                        }, 300);
+                                    } else {
+                                        console.error('❌ Eliminación falló:', data
+                                            .message);
+                                        Swal.fire({
+                                            icon: 'error',
+                                            title: 'Error',
+                                            text: data.message ||
+                                                'No se pudo eliminar el producto'
+                                        });
+                                    }
+                                })
+                                .catch(error => {
+                                    console.error('💥 ERROR CATCH:', error);
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'Error',
+                                        text: 'Ocurrió un error: ' + error
+                                            .message
+                                    });
+                                });
+                        } else {}
+                    });
+                });
+            });
+        });
+    </script>
