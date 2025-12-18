@@ -21,6 +21,7 @@ class OrdenServicio extends Model
         "observaciones",
         "estado_servicio",
         "estado",
+        "cotizacion",
     ];
     public function proveedor()
     {

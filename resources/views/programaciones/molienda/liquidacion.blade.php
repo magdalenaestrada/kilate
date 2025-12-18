@@ -224,7 +224,7 @@
                             </thead>
                             <tbody>
                                 <tr style="background: #eafaf1">
-                                    <td class="border p-2">TRATAMIENTO</td>
+                                    <td class="border p-2">MOLIENDA</td>
                                     <td class="border p-2">
                                         <input type="number" step="0.01" name="precio_unitario_proceso"
                                             value="30" class="precio-input border rounded p-1 text-xs w-20"

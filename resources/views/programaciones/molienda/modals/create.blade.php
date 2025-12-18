@@ -130,7 +130,8 @@
                               </div>
                           </div>
                       </form>
-                      <div class="mt-3 d-flex justify-content-end g-1">
+
+                      <div class="mt-3 d-flex justify-content-end g-1" id="boton_agregar">
                           <button type="button" class="btn btn-success btn-sm" id="btnAgregarPesoManual">
                               <i class="bi bi-plus-circle me-1"></i> Agregar Peso de Otra Balanza
                           </button>
@@ -141,6 +142,7 @@
                               <table class="table table-sm align-middle text-center" id="tablaOtrasBalanzas">
                                   <thead>
                                       <tr>
+                                          <th>Seleccionar</th>
                                           <th>ID</th>
                                           <th>Fecha I.</th>
                                           <th>Fecha S.</th>
@@ -151,15 +153,13 @@
                                           <th>Neto</th>
                                           <th>Balanza</th>
                                           <th>Producto</th>
-                                          <th>Estado</th>
                                           <th>Acciones</th>
                                       </tr>
                                   </thead>
                                   <tbody>
                                       <tr>
-                                          <td colspan="9" class="text-muted">No hay pesos de otras balanzas
-                                              registrados
-                                          </td>
+                                          <td colspan="12" class="text-muted">No hay pesos de otras balanzas
+                                              registrados</td>
                                       </tr>
                                   </tbody>
                               </table>

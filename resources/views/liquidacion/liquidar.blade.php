@@ -142,7 +142,6 @@
                         TON. TOTAL: <span id="totalTon">{{ number_format($totalTon, 2) }}</span>
                     </div>
 
-                    <!-- Tabla de Gastos -->
                     <div class="table-responsive col-12">
                         <table class="table table-bordered text-sm align-middle">
                             <thead>

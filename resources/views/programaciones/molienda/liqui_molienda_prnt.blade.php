@@ -222,39 +222,6 @@
         </table>
     @endif
 
-
-    {{-- Horas Trabajadas --}}
-    <br>
-    <table>
-        <thead class="subtitle-section">
-            <tr>
-                <th>FECHA INICIO</th>
-                <th>HORA INICIO</th>
-                <th>FECHA FIN</th>
-                <th>HORA FIN</th>
-                <th>TONELAJE</th>
-            </tr>
-        </thead>
-        <tbody>
-
-            @foreach ($fechas as $f)
-                <tr>
-                    <td>{{ $f->fecha_inicio }}</td>
-                    <td>{{ $f->hora_inicio }}</td>
-                    <td>{{ $f->fecha_fin }}</td>
-                    <td>{{ $f->hora_fin }}</td>
-                    <td>{{ $f->tonelaje }}</td>
-                </tr>
-            @endforeach
-
-            <tr class="title-section">
-                <td colspan="4">TOTAL HORAS</td>
-                <td>{{ number_format($fechas->sum('tonelaje'), 2) }}</td>
-            </tr>
-        </tbody>
-    </table>
-
-
     <br>
     <table>
         <thead>

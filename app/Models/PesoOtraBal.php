@@ -47,4 +47,6 @@ class PesoOtraBal extends Model
     {
         return $this->belongsTo(PsEstado::class, 'estado_id');
     }
+
+    
 }

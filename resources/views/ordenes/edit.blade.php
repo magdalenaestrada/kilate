@@ -18,8 +18,8 @@
                     @method('PUT')
 
                     {{-- DATOS DEL PROVEEDOR --}}
-                    <div class="row mb-3">
-                        <div class="col-md-4">
+                    <div class="row mb-2">
+                        <div class="col-md-3">
                             <label for="documento_proveedor" class="form-label">RUC / Documento</label>
                             <div class="input-group">
                                 <input type="text" name="documento_proveedor" id="documento_proveedor"
@@ -29,16 +29,21 @@
                             </div>
                         </div>
 
-                        <div class="col-md-4">
+                        <div class="col-md-5">
                             <label for="proveedor" class="form-label">Proveedor / Razón Social</label>
                             <input type="text" name="proveedor" id="proveedor" class="form-control" required
                                 placeholder="Nombre del proveedor" value="{{ $orden->proveedor->razon_social ?? '' }}">
                         </div>
 
-                        <div class="col-md-4">
+                        <div class="col-md-2">
                             <label for="telefono_proveedor" class="form-label">Teléfono</label>
                             <input type="text" name="telefono_proveedor" id="telefono_proveedor" class="form-control"
                                 value="{{ $orden->proveedor->telefono ?? '' }}">
+                        </div>
+                        <div class="col-md-2">
+                            <label for="codigo_cotizacion" class="form-label">Código de cotización</label>
+                            <input type="text" name="codigo_cotizacion" id="codigo_cotizacion" class="form-control"
+                                value="{{ $orden->cotizacion ?? '' }}">
                         </div>
                     </div>
 
@@ -71,7 +76,6 @@
                     <hr>
                     <h6>Servicios / Detalles</h6>
 
-                    {{-- TABLA DE SERVICIOS --}}
                     <table class="table table-bordered" id="tablaServicios">
                         <thead class="table-light text-center">
                             <tr>
@@ -116,8 +120,8 @@
                         </div>
                         <div class="col-md-3">
                             <label for="costo_final" class="form-label">Total con IGV (S/)</label>
-                            <input type="number" step="0.01" name="costo_final" id="costo_final" class="form-control"
-                                readonly value="{{ $orden->costo_final }}">
+                            <input type="number" step="0.01" name="costo_final" id="costo_final"
+                                class="form-control" readonly value="{{ $orden->costo_final }}">
                         </div>
                     </div>
 
@@ -312,7 +316,7 @@
         document.addEventListener('DOMContentLoaded', function() {
             const fechaInicio = document.getElementById('fecha_inicio');
             const fechaFin = document.getElementById('fecha_fin');
-            
+
             fechaInicio.addEventListener('change', function() {
                 fechaFin.min = this.value;
                 if (fechaFin.value && fechaFin.value < this.value) {

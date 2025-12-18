@@ -10,6 +10,7 @@ use App\Models\Log;
 use App\Models\Comida;
 use App\Models\Persona;
 use App\Models\Lote;
+use Illuminate\Support\Str;
 use Spatie\Permission\Models\Permission;
 
 class RanchoController extends Controller
@@ -18,7 +19,7 @@ class RanchoController extends Controller
 
 
     public function __construct()
-    { 
+    {
         $this->middleware('permission:view comedor', ['only' => ['index']]);
         $this->middleware('permission:create comedor', ['only' => ['create', 'store']]);
         $this->middleware('permission:print comedor', ['only' => ['prnpriview']]);
@@ -47,18 +48,18 @@ class RanchoController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'datos_cliente' =>'required',
+            'datos_cliente' => 'required',
             'documento_trabajador' => 'required|string|max:255',
             'datos_trabajador' => 'required|string|max:255',
             'lote' => 'required|string|max:255',
             'cantidad' => 'required',
 
 
-        
+
         ]);
 
         $rancho = new Rancho;
-        
+
         $rancho->documento_cliente = '0';
         $rancho->datos_cliente = $request->input('datos_cliente');
         $rancho->comida_id = $request->comida_id;
@@ -68,22 +69,22 @@ class RanchoController extends Controller
         $rancho->cantidad = $request->input('cantidad');
         $rancho->estado = 'abierto';
         $rancho->cancelado = 'no';
-        $rancho->lote = $request->input('lote');
+        $rancho->lote = Str::upper($request->input('lote'));
         $rancho->usuario = auth()->user()->name;
 
-        $lote_nombre = $request->input('lote');
-        $existingLote= Lote::where('nombre', $lote_nombre)->first();
+        $lote_nombre = Str::upper($request->input('lote'));
+        $existingLote = Lote::where('nombre', $lote_nombre)->first();
 
-        if($existingLote){
-            
-        }else{
+        if ($existingLote) {
+        } else {
             $lote = new Lote();
+            $lote->codigo = $this->GenerarCodigo();
             $lote->nombre = $lote_nombre;
-            $lote->usuario = auth()->user()->name;
+            $lote->usuario_id = auth()->id();
             $lote->save();
         }
 
-        
+
         $rancho->save();
 
         return redirect()->route('ranchos.index')->with('success', 'Ticket creado correctamente');
@@ -103,6 +104,21 @@ class RanchoController extends Controller
     public function edit(string $id)
     {
         //
+    }
+
+    public function GenerarCodigo()
+    {
+        $ultimo = Lote::where('codigo', 'like', 'COM-%')
+            ->orderBy('id', 'desc')
+            ->first();
+
+        if (!$ultimo) {
+            return 'COM-0001';
+        }
+
+        $numero = (int) str_replace('COM-', '', $ultimo->codigo) + 1;
+
+        return 'COM-' . str_pad($numero, 4, '0', STR_PAD_LEFT);
     }
 
     /**
@@ -127,7 +143,7 @@ class RanchoController extends Controller
         $log->id_fila_afectada = $rancho->id;
         $log->dato_importante = $rancho->lote;
         $log->save();
-        
+
 
 
 
@@ -136,32 +152,24 @@ class RanchoController extends Controller
 
 
         return redirect()->route('ranchos.index')->with('eliminar-ticket', 'Ticket eliminado con éxito');
-
-
     }
-
     public function prnpriview(string $id)
     {
         $ranchos = Rancho::all();
         $rancho = Rancho::findOrFail($id);
-        if ($rancho->estado == 'abierto')
-        {
+        if ($rancho->estado == 'abierto') {
             $rancho->estado = 'impreso';
             $rancho->save();
         }
-       
-        
+
+
         return view('ranchos.printticket', compact('rancho'));
-                
     }
 
-    public function get_persona(){
+    public function get_persona()
+    {
         $p  = Persona::all();
 
         return response()->json($p);
     }
-
-
- 
-
 }

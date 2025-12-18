@@ -18,7 +18,7 @@
 
                     {{-- DATOS DEL PROVEEDOR --}}
                     <div class="row mb-3">
-                        <div class="col-md-4">
+                        <div class="col-md-3">
                             <label for="documento_proveedor" class="form-label">RUC / Documento</label>
                             <div class="input-group">
                                 <input type="text" name="documento_proveedor" id="documento_proveedor"
@@ -26,16 +26,19 @@
                                 <button class="btn btn-success" type="button" id="buscar_proveedor_btn">Buscar</button>
                             </div>
                         </div>
-
-                        <div class="col-md-4">
+                        <div class="col-md-5">
                             <label for="proveedor" class="form-label">Proveedor / Razón Social</label>
                             <input type="text" name="proveedor" id="proveedor" class="form-control" required
                                 placeholder="Nombre del proveedor">
                         </div>
 
-                        <div class="col-md-4">
+                        <div class="col-md-2">
                             <label for="telefono_proveedor" class="form-label">Teléfono</label>
                             <input type="text" name="telefono_proveedor" id="telefono_proveedor" class="form-control">
+                        </div>
+                        <div class="col-md-2">
+                            <label for="codigo_cotizacion" class="form-label">Código de cotización</label>
+                            <input type="text" name="codigo_cotizacion" id="codigo_cotizacion" class="form-control">
                         </div>
                     </div>
 
@@ -284,6 +287,7 @@
                     $('#documento_proveedor').val(response.ruc || $('#documento_proveedor').val());
                     $('#direccion_proveedor').val(response.direccion || '');
                     $('#telefono_proveedor').val(response.telefono || '');
+                    $('#codigo_cotizacion').val(response.cotizacion || '');
                     $('#proveedor').val(response.razon_social || response.nombre || '');
                 }
             });

@@ -125,7 +125,6 @@ Route::group(['middleware' => ['auth']], function () {
 
     Route::get('tscuentasreportesdiarios/{id}/filter', [TsReporteDiarioCuentasController::class, 'filter'])->name('tscuentasreportesdiarios.filter');
 
-    //GET SALIDAS MIS CAJAS ROUTE
 
     Route::get('/tssalidasmiscajas', [TsMicajaController::class, 'indexsalidas'])->name('tsmiscajas.salidas');
     Route::get('/tsingresosmiscajas', [TsMicajaController::class, 'indexingresos'])->name('tsmiscajas.ingresos');
@@ -305,6 +304,8 @@ Route::group(['middleware' => ['auth']], function () {
     Route::delete('/lotes/destroy', [LoteController::class, 'destroy'])->name('lotes.destroy');
     Route::get('/lotes/buscar', [LoteController::class, 'buscar'])->name('lotes.buscar');
     Route::get('/lotes/{id}/pesos', [LoteController::class, 'pesosEnCancha'])->name('lotes.pesos');
+    Route::get('/lotes/{lote}/pesos-otras', [PesoOtraBalController::class, 'pesosOtrasLote'])->name('otros.pesos');
+
 
     //procesos
     Route::get('/procesos', [ProcesoController::class, 'index'])->name('procesos');
@@ -339,9 +340,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/liquidaciones/create/{proceso}', [LiquidacionesController::class, 'liquidar'])->name('liquidaciones.create');
     Route::post('/liquidaciones/guardar', [LiquidacionesController::class, 'store'])->name('liquidaciones.store');
     Route::get('/liquidaciones/{id}/print', [LiquidacionesController::class, 'print'])->name('liquidaciones.print');
-
-
-    //pesos
+    //peso
     Route::get('/pesos', [PesoController::class, 'index'])->name('pesos.index');
     Route::post('/pesos', [PesoController::class, 'pesos'])->name('pesos');
     Route::put('/pesos-update/{id}', [PesoController::class, 'update'])->name('pesos.update');
@@ -358,6 +357,10 @@ Route::group(['middleware' => ['auth']], function () {
         Route::get('/{id}/pesos', [PlProgramacionController::class, 'datatable']);
     });
 
+
+    Route::get('/otras-balanza', [PesoOtraBalController::class, 'index'])->name('otrasBalanza.index');
+    Route::post('/pesos-otras-balanza', [PesoOtraBalController::class, 'pesos'])->name('otrasBalanza');
+    Route::post('/otras-balanza/guardar', [PesoOtraBalController::class, 'guardar'])->name('otrasBalanza.guardar');
     Route::post('/otras-balanza/{id}', [PesoOtraBalController::class, 'store'])->name('otrasBalanza.store');
     Route::post('/otras-balanza/{id}/molienda', [PesoOtraBalController::class, 'guardar_molienda'])->name('otrasBalanza.guardar_molienda');
     Route::delete('/otras-balanza/{id}', [PesoOtraBalController::class, 'destroy'])->name('otrasBalanza.destroy');

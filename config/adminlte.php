@@ -472,6 +472,11 @@ return [
                     'can' => 'ver producto',
                 ],
                 [
+                    'text' => 'Otras Balanzas',
+                    'url' => '/otras-balanza',
+                    'can' => 'ver producto',
+                ],
+                [
                     'text' => 'Molienda',
                     'url' => '/molienda',
                     'can' => 'ver producto',

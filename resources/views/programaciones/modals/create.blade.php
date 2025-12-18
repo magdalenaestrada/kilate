@@ -15,7 +15,7 @@
 
                               <div class="combo">
                                   <input type="text" id="lote_id_input" class="form-control"
-                                      placeholder="Escriba o seleccione...">
+                                      placeholder="Escriba o seleccione..." autocomplete="off">
 
                                   <select id="lote_id" class="form-control" size="5" style="display:none;">
                                       @foreach ($lotes as $lote)
@@ -128,8 +128,8 @@
                           <div class="row g-3">
                               <div class="col-md-2">
                                   <label class="form-label fw-semibold">Fecha inicio</label>
-                                  <input type="datetime-local" class="form-control" id="fechai" name="fechai" max="{{ $hoy }}"
-                                      value="{{ $hoy }}" required>
+                                  <input type="datetime-local" class="form-control" id="fechai" name="fechai"
+                                      max="{{ $hoy }}" value="{{ $hoy }}" required>
                               </div>
                               <div class="col-md-2">
                                   <label class="form-label fw-semibold">Fecha salida</label>
@@ -163,7 +163,6 @@
                                           <th>Neto</th>
                                           <th>Balanza</th>
                                           <th>Producto</th>
-                                          <th>Estado</th>
                                           <th>Acciones</th>
                                       </tr>
                                   </thead>

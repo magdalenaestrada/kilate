@@ -78,6 +78,7 @@ class OrdenServicioController extends Controller
             "fecha_inicio" => $request->fecha_inicio,
             "fecha_fin" => $request->fecha_fin,
             "descripcion" => $request->descripcion,
+            "cotizacion" => $request->codigo_cotizacion,
             "costo_estimado" => $request->costo_estimado,
             "costo_final" => $request->costo_final,
             "codigo" => $this->generarCodigo()
@@ -184,6 +185,7 @@ class OrdenServicioController extends Controller
                     "fecha_inicio" => $request->fecha_inicio,
                     "fecha_fin" => $request->fecha_fin,
                     "descripcion" => $request->descripcion,
+                    "cotizacion" => $request->codigo_cotizacion,
                     "costo_estimado" => $request->costo_estimado,
                     "costo_final" => $request->costo_final,
                     "updated_at" => $hoy,
@@ -302,7 +304,7 @@ class OrdenServicioController extends Controller
         $orden->update([
             'estado_servicio' => 'C',
         ]);
-       
+
 
         return redirect()
             ->route('orden-servicio.index')

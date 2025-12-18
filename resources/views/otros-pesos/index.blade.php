@@ -5,7 +5,19 @@
     <div class="container-fluid mt-4">
         <div class="card shadow-sm">
             <div class="card-header">
-                <h4 class="mb-0"><i class="bi bi-clipboard-data me-2"></i>Gestión de Pesos</h4>
+                <div class="d-flex justify-content-between align-items-center py-2">
+                    <div>
+                        <h4 class="mb-0 ">
+                            <i class="bi bi-clipboard-data me-2"></i>
+                            PESOS DE OTRAS BALANZAS
+                        </h4>
+                    </div>
+                    <div>
+                        <button type="button" class="btn btn-success" id="btnAbrirModal">
+                            <i class="bi bi-plus-circle me-1"></i> Agregar Peso
+                        </button>
+                    </div>
+                </div>
             </div>
             <div class="card-body">
                 @php
@@ -19,17 +31,16 @@
                         <div class="col-md-2">
                             <label class="form-label fw-semibold"><i class="bi bi-calendar-date text-primary"></i> Fecha
                                 Desde</label>
-                            <input type="date" name="desde" max="{{ $hoy }}" class="form-control">
+                            <input type="date" name="desde" class="form-control">
                         </div>
                         <div class="col-md-2">
                             <label class="form-label fw-semibold"><i class="bi bi-calendar-check text-primary"></i> Fecha
                                 Hasta</label>
-                            <input type="date" name="hasta" class="form-control" value="{{ $hoy }}"
-                                max="{{ $hoy }}" required>
+                            <input type="date" name="hasta" class="form-control" required>
                         </div>
                         <div class="col-md-3">
                             <label class="form-label fw-semibold">Razón Social</label>
-                            <input type="text" name="RazonSocial" class="form-control" placeholder="Buscar Razón Social">
+                            <input type="text" name="razon" class="form-control" placeholder="Buscar Razón Social">
                         </div>
 
                         <div class="col-md-2">
@@ -43,7 +54,6 @@
                         <div class="col-md-1">
                             <label class="form-label fw-semibold">Estado</label>
                             <select name="estado_id" class="form-control form-select-sm estado-select w-150">
-                                <option value="sin_estado">SIN ASIGNAR</option>
                                 <option value="">TODOS</option>
                                 @foreach ($estados as $estadoOpt)
                                     <option value="{{ $estadoOpt->id }}">
@@ -51,29 +61,28 @@
                                     </option>
                                 @endforeach
                             </select>
-
                         </div>
                         <div class="col-md-1">
                             <label class="form-label fw-semibold">Ticket</label>
-                            <input type="text" name="NroSalida" class="form-control" placeholder="Buscar">
+                            <input type="text" name="id" class="form-control" placeholder="Buscar">
                         </div>
                         <div class="col-md-2">
                             <label class="form-label fw-semibold">Producto</label>
-                            <input type="text" name="Producto" class="form-control" value="MINERAL A GRANEL"
+                            <input type="text" name="producto" class="form-control" value="MINERAL A GRANEL"
                                 placeholder="Buscar Producto">
                         </div>
 
                         <div class="col-md-2">
                             <label class="form-label fw-semibold">Conductor</label>
-                            <input type="text" name="Conductor" class="form-control" placeholder="Buscar Conductor">
+                            <input type="text" name="conductor" class="form-control" placeholder="Buscar Conductor">
                         </div>
                         <div class="col-md-1">
                             <label class="form-label fw-semibold">Placa</label>
-                            <input type="text" name="Placa" class="form-control" placeholder="Buscar">
+                            <input type="text" name="placa" class="form-control" placeholder="Buscar">
                         </div>
                         <div class="col-md-3">
                             <label class="form-label fw-semibold">Observación</label>
-                            <input type="text" name="Observacion" class="form-control" placeholder="Buscar Observación">
+                            <input type="text" name="observacion" class="form-control" placeholder="Buscar Observación">
                         </div>
                         <div class="col-md-2">
                             <label class="form-label fw-semibold">Lote</label>
@@ -87,21 +96,32 @@
                 </form>
                 <hr class="my-4">
                 <div id="tabla-container">
-
                 </div>
 
             </div>
         </div>
     </div>
+    @include('otros-pesos.modals.create')
 @endsection
 
 @push('scripts')
     <script>
         document.addEventListener("DOMContentLoaded", () => {
+            const btn = document.getElementById("btnAbrirModal");
+            const modalEl = document.getElementById("modalPesoOtraBalanza");
+
+            const modal = new bootstrap.Modal(modalEl);
+
+            btn.addEventListener("click", () => {
+                modal.show();
+            });
+        });
+
+        document.addEventListener("DOMContentLoaded", () => {
             const filtrosForm = document.getElementById("filtros");
             const tablaContainer = document.querySelector("#tabla-container");
 
-            async function cargarTabla(url = "{{ route('pesos') }}") {
+            async function cargarTabla(url = "{{ route('otrasBalanza') }}") {
                 const formData = new FormData(filtrosForm);
                 try {
                     const res = await fetch(url, {
@@ -128,6 +148,55 @@
                 cargarTabla();
             });
 
+            document.getElementById('btnCerrarModal')?.addEventListener('click', () => {
+                $('#modalPesoOtraBalanza').modal('close');
+            });
+            document.getElementById('btnGuardar').addEventListener('click', async () => {
+                const loteId = document.getElementById('lote_id_real').value;
+
+                if (!loteId) {
+                    return Swal.fire(
+                        'Lote inválido',
+                        'Debes seleccionar un lote de la lista',
+                        'warning'
+                    );
+                }
+
+                const form = document.getElementById('formPesoManual');
+                const formData = new FormData(form);
+
+                try {
+                    const res = await fetch("{{ route('otrasBalanza.guardar') }}", {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        },
+                        body: formData
+                    });
+
+                    const data = await res.json();
+
+                    if (data.success) {
+                        Swal.fire('Guardado', 'Peso registrado correctamente', 'success');
+                        form.reset();
+                        document.getElementById('lote_id_real').value = '';
+                    }
+
+                } catch (e) {
+                    Swal.fire('Error', 'No se pudo guardar', 'error');
+                }
+            });
+
+
+
+            $(document).on('input', '#formPesoManual input[name="bruto"], #formPesoManual input[name="tara"]',
+                function() {
+                    const bruto = parseFloat($('#formPesoManual input[name="bruto"]').val()) || 0;
+                    const tara = parseFloat($('#formPesoManual input[name="tara"]').val()) || 0;
+                    const neto = bruto - tara;
+                    $('#formPesoManual input[name="neto"]').val(neto >= 0 ? neto.toFixed(2) : 0);
+                });
+
             document.addEventListener("click", async e => {
                 const link = e.target.closest(".pagination a");
                 if (link) {
@@ -144,10 +213,8 @@
                 const estadoSelect = document.querySelector(`.estado-select[data-peso="${pesoId}"]`);
                 const inputLote = document.querySelector(`.lote-input[data-peso="${pesoId}"]`);
                 const selectLote = inputLote.closest('.combo').querySelector('.lote-select');
-
                 const estadoId = estadoSelect?.value;
                 const loteNombre = inputLote?.value.trim();
-
                 const option = Array.from(selectLote.options)
                     .find(opt => opt.text.trim().toLowerCase() === loteNombre.toLowerCase());
 
@@ -218,6 +285,39 @@
                         text: err.message || 'Error al guardar los datos.',
                         confirmButtonColor: '#d33'
                     });
+                }
+            });
+
+            $(document).on('input', '#lote_id_input', function() {
+                const filtro = $(this).val().toLowerCase().trim();
+                const select = $('#lote_id');
+                let visibles = 0;
+
+                if (!filtro) {
+                    select.hide();
+                    return;
+                }
+
+                select.find('option').each(function() {
+                    const match = $(this).text().toLowerCase().includes(filtro);
+                    $(this).toggle(match);
+                    if (match) visibles++;
+                });
+
+                visibles > 0 ? select.show() : select.hide();
+            });
+
+            $(document).on('change', '#lote_id', function() {
+                const option = $(this).find('option:selected');
+
+                $('#lote_id_input').val(option.text().trim());
+                $('#lote_id_real').val(option.val());
+                $(this).hide();
+            });
+
+            $(document).on('click', function(e) {
+                if (!$(e.target).closest('#lote_id, #lote_id_input').length) {
+                    $('#lote_id').hide();
                 }
             });
 

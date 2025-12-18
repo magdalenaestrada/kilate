@@ -270,4 +270,3 @@ $sum_of_cantidad = App\Models\Rancho::where('lote', $lote)
                 });
     </script>
 @endsection
-

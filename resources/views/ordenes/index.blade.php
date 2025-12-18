@@ -37,6 +37,7 @@
                             <thead>
                                 <tr>
                                     <th>{{ __('CODIGO') }}</th>
+                                    <th>{{ __('COTIZACIÓN') }}</th>
                                     <th>{{ __('PROVEEDOR') }}</th>
                                     <th>{{ __('FECHA DE INICIO') }}</th>
                                     <th>{{ __('FECHA DE FIN') }}</th>
@@ -51,6 +52,7 @@
                                 @forelse ($ordenes as $orden)
                                     <tr>
                                         <td>{{ $orden->codigo }}</td>
+                                        <td>{{ $orden->cotizacion ?? '-' }}</td>
                                         <td>{{ $orden->proveedor->razon_social ?? '-' }}</td>
                                         <td>{{ optional($orden->fecha_inicio)->format('Y-m-d') ?? '-' }}</td>
                                         <td>{{ optional($orden->fecha_fin)->format('Y-m-d') ?? '-' }}</td>

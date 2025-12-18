@@ -105,9 +105,16 @@
                 $('#programacion_id').val('');
                 $('#peso_total').val('');
                 $('#lote_id').prop('disabled', false);
-                $('#otra_balanza').hide();
+                $('#otra_balanza').show();
+                $('#formPesoManual').hide();
+                $('#boton_agregar').hide();
 
                 tablaBody.html('<tr><td colspan="8" class="text-muted">Seleccione un lote...</td></tr>');
+
+                $('#tablaOtrasBalanzas tbody').html(
+                    '<tr><td colspan="12" class="text-muted">No hay pesos de otras balanzas registrados</td></tr>'
+                );
+
                 modal.show();
             });
 
@@ -164,28 +171,39 @@
                 if (!loteId) {
                     tablaBody.html(
                         '<tr><td colspan="8" class="text-muted">Seleccione un lote...</td></tr>');
+                    $('#tablaOtrasBalanzas tbody').html(
+                        '<tr><td colspan="12" class="text-muted">No hay pesos de otras balanzas registrados</td></tr>'
+                    );
                     return;
                 }
 
                 if (!programacionId) {
+
                     axios.get(`/lotes/${loteId}/pesos`)
                         .then(res => {
                             const pesos = res.data;
                             tablaBody.html('');
-                            pesos.forEach(peso => {
-                                tablaBody.append(`
-                        <tr>
-                            <td><input type="checkbox" class="peso-check" value="${peso.NroSalida}" data-neto="${peso.Neto}"></td>
-                            <td>${peso.NroSalida}</td>
-                            <td>${peso.Fechas ?? '-'}</td>
-                            <td>${peso.Bruto ?? '-'}</td>
-                            <td>${peso.Tara ?? '-'}</td>
-                            <td>${peso.Neto ?? '-'}</td>
-                            <td>${peso.Horai ?? '-'}</td>
-                            <td>${peso.Horas ?? '-'}</td>
-                        </tr>
-                    `);
-                            });
+
+                            if (pesos.length === 0) {
+                                tablaBody.html(
+                                    '<tr><td colspan="8" class="text-muted">No hay pesos disponibles</td></tr>'
+                                );
+                            } else {
+                                pesos.forEach(peso => {
+                                    tablaBody.append(`
+                            <tr>
+                                <td><input type="checkbox" class="peso-check" value="${peso.NroSalida}" data-neto="${peso.Neto}"></td>
+                                <td>${peso.NroSalida}</td>
+                                <td>${peso.Fechas ?? '-'}</td>
+                                <td>${peso.Bruto ?? '-'}</td>
+                                <td>${peso.Tara ?? '-'}</td>
+                                <td>${peso.Neto ?? '-'}</td>
+                                <td>${peso.Horai ?? '-'}</td>
+                                <td>${peso.Horas ?? '-'}</td>
+                            </tr>
+                        `);
+                                });
+                            }
                             calcularTotal();
                         })
                         .catch(() => {
@@ -193,8 +211,48 @@
                                 '<tr><td colspan="8" class="text-danger">Error al cargar los pesos.</td></tr>'
                             );
                         });
+
+                    axios.get(`/lotes/${loteId}/pesos-otras`)
+                        .then(res => {
+                            const pesosOtras = res.data;
+                            const tablaOtrasBody = $('#tablaOtrasBalanzas tbody');
+                            tablaOtrasBody.html('');
+
+                            if (pesosOtras.length === 0) {
+                                tablaOtrasBody.html(
+                                    '<tr><td colspan="12" class="text-muted">No hay pesos de otras balanzas disponibles</td></tr>'
+                                );
+                            } else {
+                                pesosOtras.forEach(peso => {
+                                    tablaOtrasBody.append(`
+                            <tr>
+                                <td><input type="checkbox" class="peso-otra-check" value="${peso.id}" data-neto="${peso.neto}"></td>
+                                <td>${peso.id}</td>
+                                <td>${moment(peso.fechai).format('DD/MM/YYYY HH:mm')}</td>
+                                <td>${moment(peso.fechas).format('DD/MM/YYYY HH:mm')}</td>
+                                <td>${peso.placa ?? '-'}</td>
+                                <td>${peso.conductor ?? '-'}</td>
+                                <td>${peso.bruto ?? '-'}</td>
+                                <td>${peso.tara ?? '-'}</td>
+                                <td class="fw-bold text-success">${peso.neto ?? '-'}</td>
+                                <td>${peso.balanza ?? '-'}</td>
+                                <td>${peso.producto ?? '-'}</td>
+                                <td><span class="badge bg-success">Disponible</span></td>
+                            </tr>
+                        `);
+                                });
+                            }
+                            calcularTotal();
+                        })
+                        .catch(error => {
+                            console.error('Error al cargar pesos de otras balanzas:', error);
+                            $('#tablaOtrasBalanzas tbody').html(
+                                '<tr><td colspan="12" class="text-danger">Error al cargar pesos de otras balanzas</td></tr>'
+                            );
+                        });
                 }
             });
+
 
             $(document).on('click', function(e) {
                 if (!$(e.target).closest('#lote_id, #lote_id_input').length) {
@@ -209,9 +267,15 @@
                     fecha_inicio: $('#fecha_inicio').val(),
                     fecha_fin: $('#fecha_fin').val(),
                     circuito: $('#circuito').val(),
+
                     pesos: $('.peso-check:checked').map(function() {
                         return this.value;
                     }).get(),
+
+                    pesos_otras: $('.peso-otra-check:checked').map(function() {
+                        return this.value;
+                    }).get(),
+
                     peso_total: $('#peso_total').val()
                 };
 
@@ -257,8 +321,10 @@
                     });
                     return;
                 }
+                let pesosPrincipales = data.pesos || [];
+                let pesosOtras = data.pesos_otras || [];
 
-                if (!programacionId && data.pesos.length === 0) {
+                if (!programacionId && (pesosPrincipales.length + pesosOtras.length === 0)) {
                     return Swal.fire('Sin pesos seleccionados', 'Debe seleccionar al menos un peso.',
                         'warning');
                 }
@@ -321,13 +387,16 @@
                         const pesosBalanza = pesosTodos.filter(peso => peso.tipo === 'balanza');
                         const pesosOtrasBalanzas = pesosTodos.filter(peso => peso.tipo === 'manual');
 
-                        $('#lote_id').val(p.proceso.lote.id).trigger('change');
+                        const loteTexto = p.proceso.lote.nombre;
+                        $('#lote_id_input').val(loteTexto);
+                        $('#lote_id_real').val(p.proceso.lote.id);
                         $('#lote_id').prop('disabled', true);
                         $('#circuito').val(p.proceso.circuito).trigger('change');
                         $('#fecha_inicio').val(moment(p.fecha_inicio).format('YYYY-MM-DDTHH:mm'));
                         $('#fecha_fin').val(moment(p.fecha_fin).format('YYYY-MM-DDTHH:mm'));
-
                         $('#otra_balanza').show();
+                        $('#formPesoManual').show();
+                        $('#boton_agregar').show();
 
                         const tablaBody = $('#tablaPesos tbody');
                         tablaBody.html('');
@@ -338,8 +407,10 @@
                             );
                         } else {
                             pesosBalanza.forEach(peso => {
-                                const disabled = (peso.estado_id === 3 || peso.estado_id ===
-                                    4) ? 'disabled' : '';
+                                // Deshabilitar si el estado NO es CANCHA (estado_id !== 1)
+                                const disabled = (peso.estado_id !== 1) ? 'disabled' : '';
+                                const estadoClass = (peso.estado_id !== 1) ? 'bg-warning' : '';
+
                                 tablaBody.append(`
                         <tr>
                             <td>
@@ -374,25 +445,27 @@
                     });
             });
 
+
             function cargarTablaOtrasBalanzas(pesosOtrasBalanzas) {
                 const tablaOtrasBody = $('#tablaOtrasBalanzas tbody');
                 tablaOtrasBody.html('');
 
                 if (pesosOtrasBalanzas.length === 0) {
                     tablaOtrasBody.html(
-                        '<tr><td colspan="9" class="text-muted">No hay pesos de otras balanzas registrados</td></tr>'
+                        '<tr><td colspan="12" class="text-muted">No hay pesos de otras balanzas registrados</td></tr>'
                     );
                 } else {
                     pesosOtrasBalanzas.forEach(peso => {
-                        const estadoBadge = peso.estado_nombre ?
-                            `<span class="badge bg-info">${peso.estado_nombre}</span>` :
-                            '<span class="badge bg-secondary">-</span>';
+                        // Deshabilitar checkbox si el estado NO es CANCHA (estado_id !== 1)
+                        const checkboxDisabled = (peso.estado_id !== 1) ? 'disabled' : '';
+                        const estadoClass = (peso.estado_id !== 1) ? 'bg-warning' : '';
 
                         let botonEliminar = '';
                         if (peso.estado_id === 1) {
+                            // Solo se puede eliminar si está en CANCHA
                             botonEliminar = `
                     <button class="btn btn-sm btn-danger btn-eliminar-otra-balanza" 
-                            data-id="${peso.NroSalida}"
+                            data-id="${peso.id}"
                             title="Eliminar peso">
                         <i class="fa fa-trash"></i>
                     </button>
@@ -401,7 +474,7 @@
                             botonEliminar = `
                     <button class="btn btn-sm btn-secondary" 
                             disabled 
-                            title="No se puede eliminar. Estado: ${peso.estado_nombre}">
+                            title="No se puede eliminar. Estado: ${peso.estado_nombre || 'N/A'}">
                         <i class="fa fa-lock"></i>
                     </button>
                 `;
@@ -409,6 +482,14 @@
 
                         tablaOtrasBody.append(`
                 <tr>
+                    <td>
+                        <input type="checkbox" 
+                               class="peso-otra-check" 
+                               value="${peso.id}" 
+                               data-neto="${peso.neto}" 
+                               checked 
+                               ${checkboxDisabled}>
+                    </td>
                     <td>${peso.id}</td>
                     <td>${moment(peso.fechai).format('DD/MM/YYYY HH:mm')}</td>
                     <td>${moment(peso.fechas).format('DD/MM/YYYY HH:mm')}</td>
@@ -419,14 +500,14 @@
                     <td class="fw-bold text-success">${peso.neto ?? '-'}</td>
                     <td>${peso.balanza ?? '-'}</td>
                     <td>${peso.producto ?? '-'}</td>
-                    <td>${estadoBadge}</td>
                     <td>${botonEliminar}</td>
-
                 </tr>
             `);
                     });
                 }
             }
+
+
 
             $(document).on('click', '#btnAgregarPesoManual', function() {
                 const programacionId = $('#programacion_id').val();
@@ -470,6 +551,7 @@
                                     showConfirmButton: false
                                 }).then(() => {
                                     form.reset();
+                                    $('#otra_balanza').show();
 
                                     axios.get(`/programaciones/${programacionId}/pesos`)
                                         .then(res => {
@@ -489,24 +571,36 @@
                                                 );
                                             } else {
                                                 pesosBalanza.forEach(peso => {
+                                                    // Deshabilitar si el estado NO es CANCHA (estado_id !== 1)
                                                     const disabled = (peso
-                                                            .estado_id ===
-                                                            3 || peso
-                                                            .estado_id === 4
-                                                        ) ? 'disabled' :
+                                                            .estado_id !== 1
+                                                            ) ? 'disabled' :
                                                         '';
+                                                    const estadoClass = (
+                                                            peso
+                                                            .estado_id !== 1
+                                                            ) ?
+                                                        'bg-warning' : '';
+
                                                     tablaBody.append(`
-                                            <tr>
-                                                <td><input type="checkbox" class="peso-check" value="${peso.NroSalida}" data-neto="${peso.Neto}" checked ${disabled}></td>
-                                                <td>${peso.NroSalida}</td>
-                                                <td>${peso.Fechas ?? '-'}</td>
-                                                <td>${peso.Bruto ?? '-'}</td>
-                                                <td>${peso.Tara ?? '-'}</td>
-                                                <td class="fw-bold">${peso.Neto ?? '-'}</td>
-                                                <td>${peso.Horai ?? '-'}</td>
-                                                <td>${peso.Horas ?? '-'}</td>
-                                            </tr>
-                                        `);
+        <tr>
+            <td>
+                <input type="checkbox" 
+                       class="peso-check" 
+                       value="${peso.NroSalida}" 
+                       data-neto="${peso.Neto}" 
+                       checked 
+                       ${disabled}>
+            </td>
+            <td>${peso.NroSalida}</td>
+            <td>${peso.Fechas ?? '-'}</td>
+            <td>${peso.Bruto ?? '-'}</td>
+            <td>${peso.Tara ?? '-'}</td>
+            <td class="fw-bold">${peso.Neto ?? '-'}</td>
+            <td>${peso.Horai ?? '-'}</td>
+            <td>${peso.Horas ?? '-'}</td>
+        </tr>
+    `);
                                                 });
                                             }
 
@@ -531,9 +625,13 @@
                 });
             });
 
-            // Eliminar peso de otra balanza
+            $(document).on('change', '.peso-otra-check', function() {
+                calcularTotal();
+            });
+
+
             $(document).on('click', '.btn-eliminar-otra-balanza', function() {
-                const pesoId = $(this).data('id');
+                const pesoId = $(this).data('id'); // Ahora usa el ID correcto
                 const programacionId = $('#programacion_id').val();
 
                 Swal.fire({
@@ -572,6 +670,8 @@
                     }
                 });
             });
+
+
             $(document).on('change', '.peso-check', function() {
                 calcularTotal();
             });
@@ -581,10 +681,8 @@
                 $('.peso-check:checked').each(function() {
                     total += parseFloat($(this).data('neto') || 0);
                 });
-
-                $('#tablaOtrasBalanzas tbody tr').each(function() {
-                    const neto = parseFloat($(this).find('td:nth-child(8)').text()) || 0;
-                    total += neto;
+                $('.peso-otra-check:checked').each(function() {
+                    total += parseFloat($(this).data('neto') || 0);
                 });
                 $('#peso_total').val(total.toFixed(2));
             }

@@ -73,6 +73,18 @@ class PlProgramacionController extends Controller
                 'proceso_id' => $proceso->id,
             ]);
 
+            $pesosOtras = $request->input('pesos_otras', []);
+
+            if (!empty($pesosOtras)) {
+                PesoOtraBal::whereIn('id', $pesosOtras)
+                    ->update([
+                        'programacion_id' => $programacion->id,
+                        'proceso_id'      => $proceso->id,
+                        'estado_id'       => 2,
+                    ]);
+            }
+
+
             foreach ($request->pesos as $pesoId) {
                 ProcesoPeso::create([
                     'proceso_id' => $proceso->id,
@@ -197,6 +209,25 @@ class PlProgramacionController extends Controller
                 'peso_total' => $request->peso_total,
                 'circuito' => $request->circuito,
             ]);
+
+            $pesosOtras = $request->input('pesos_otras', []);
+
+            if (!empty($pesosOtras)) {
+                PesoOtraBal::whereIn('id', $pesosOtras)
+                    ->update([
+                        'programacion_id' => $programacion->id,
+                        'proceso_id'      => $proceso->id,
+                        'estado_id'       => 2, // ASIGNADO
+                    ]);
+            }
+
+            PesoOtraBal::where('programacion_id', $programacion->id)
+                ->whereNotIn('id', $pesosOtras)
+                ->update([
+                    'programacion_id' => null,
+                    'proceso_id'      => null,
+                    'estado_id'       => 1,
+                ]);
 
             foreach ($request->pesos as $nro) {
                 ProcesoPeso::create([

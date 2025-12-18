@@ -154,47 +154,85 @@ class TsReposicioncajaController extends Controller
     /**
      * Update the specified resource in storage.
      */
+
     public function update(Request $request, string $id)
     {
         try {
             $request->validate([
                 'descripcion' => 'nullable|string|max:255',
-                'monto' => 'nullable|numeric|min:0',
-
+                'monto' => 'required|numeric|min:0',
+                'caja_id' => 'required',
+                'cuenta_procedencia_id' => 'required',
+                'motivo_id' => 'required',
+                'fecha' => 'required|date',
             ]);
 
             $reposicioncaja = TsReposicioncaja::findOrFail($id);
-            $reposicioncaja->salidacuenta->descripcion = $request->descripcion;
-            $reposicioncaja->salidacuenta->fecha = $request->fecha;
+            $salida_cuenta = $reposicioncaja->salidacuenta;
+
+            $caja_anterior = $reposicioncaja->caja;
+            $cuenta_anterior = $salida_cuenta->cuenta;
+
+            $monto_anterior = $reposicioncaja->monto;
+            $diferencia = $request->monto - $monto_anterior;
+
+            $caja_nueva = TsCaja::findOrFail($request->caja_id);
+            $cuenta_nueva = TsCuenta::findOrFail($request->cuenta_procedencia_id);
+
+            // Validación de balance
+            if ($diferencia > 0 && $cuenta_nueva->balance < $diferencia) {
+                throw new \Exception('No hay suficiente balance en la cuenta de procedencia para aumentar la reposición.');
+            }
+
+            // Ajustar balances si cambió la caja
+            if ($caja_anterior->id != $caja_nueva->id) {
+                $caja_anterior->balance -= $monto_anterior;
+                $caja_anterior->save();
+
+                $caja_nueva->balance += $request->monto;
+                $caja_nueva->save();
+            } else {
+                $caja_nueva->balance += $diferencia;
+                $caja_nueva->save();
+            }
+
+            // Ajustar balances si cambió la cuenta de procedencia
+            if ($cuenta_anterior->id != $cuenta_nueva->id) {
+                $cuenta_anterior->balance += $monto_anterior;
+                $cuenta_anterior->save();
+
+                $cuenta_nueva->balance -= $request->monto;
+                $cuenta_nueva->save();
+            } else {
+                $cuenta_nueva->balance -= $diferencia;
+                $cuenta_nueva->save();
+            }
+
+            // Actualizar reposición
+            $reposicioncaja->caja_id = $caja_nueva->id;
+            $reposicioncaja->cuenta_procedencia_id = $cuenta_nueva->id;
+            $reposicioncaja->motivo_id = $request->motivo_id;
             $reposicioncaja->descripcion = $request->descripcion;
-
-
-            //UPDATE THE BALANCE
-            $caja = TsCaja::findOrFail($reposicioncaja->caja->id);
-            $caja->balance = $caja->balance +  ($request->monto - $reposicioncaja->monto);
-            $caja->save();
-
-            $reposicioncaja->salidacuenta->cuenta->balance = $reposicioncaja->salidacuenta->cuenta->balance -  ($request->monto - $reposicioncaja->monto);
-
-            $reposicioncaja->salidacuenta->cuenta->save();
-
             $reposicioncaja->monto = $request->monto;
-            $reposicioncaja->salidacuenta->monto = $request->monto;
-
-
-            $reposicioncaja->salidacuenta->save();
+            $reposicioncaja->tipo_comprobante_id = $request->tipo_comprobante_id ?? $reposicioncaja->tipo_comprobante_id;
+            $reposicioncaja->comprobante_correlativo = $request->comprobante_correlativo ?? $reposicioncaja->comprobante_correlativo;
             $reposicioncaja->save();
 
+            // Actualizar salida de cuenta
+            $salida_cuenta->cuenta_id = $cuenta_nueva->id;
+            $salida_cuenta->descripcion = $request->descripcion;
+            $salida_cuenta->monto = $request->monto;
+            $salida_cuenta->tipo_comprobante_id = $request->tipo_comprobante_id ?? $salida_cuenta->tipo_comprobante_id;
+            $salida_cuenta->comprobante_correlativo = $request->comprobante_correlativo ?? $salida_cuenta->comprobante_correlativo;
+            $salida_cuenta->fecha = $request->fecha;
+            $salida_cuenta->save();
 
             return redirect()->route('tsreposicionescajas.index')->with('status', 'Reposición actualizada con éxito.');
-        } catch (QueryException $e) {
-
-            return redirect()->back()->with('error', 'Error desconocido');
         } catch (\Exception $e) {
-
             return redirect()->back()->with('error', 'Error: ' . $e->getMessage());
         }
     }
+
 
     /**
      * Remove the specified resource from storage.
@@ -278,7 +316,7 @@ class TsReposicioncajaController extends Controller
     {
 
         $reposicion_id = $id;
-       
+
 
         return Excel::download(new TsMicajaExport($reposicion_id), 'reportecaja.xlsx');
     }
