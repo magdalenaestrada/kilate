@@ -14,7 +14,6 @@
                 <th>Ticket</th>
                 <th>Estado</th>
                 <th>Lote</th>
-                <th>Acción</th>
                 <th>Fecha I.</th>
                 <th>Fecha S.</th>
                 <th>Producto</th>
@@ -25,6 +24,8 @@
                 <th>Destino</th>
                 <th>Neto</th>
                 <th>Observación</th>
+                <th>Opciones</th>
+                <th>Responsable</th>
             </tr>
         </thead>
 
@@ -92,14 +93,6 @@
                                 value="{{ $loteActual->id ?? '' }}">
                         </div>
                     </td>
-
-                    <td>
-                        @if (!$tieneEstado)
-                            <button class="btn btn-success btn-sm guardar-btn" data-peso="{{ $peso->id }}">
-                                <i class="bi bi-save"></i> Guardar
-                            </button>
-                        @endif
-                    </td>
                     <td>{{ $peso->fechai }}</td>
                     <td>{{ $peso->fechas }}</td>
                     <td>{{ $peso->producto }}</td>
@@ -110,11 +103,24 @@
                     <td>{{ $peso->destino }}</td>
                     <td>{{ number_format($peso->neto, 2) }}</td>
                     <td>{{ $peso->observacion }}</td>
+                    <td>
+                        @if ($peso->estado_id == 1)
+                            <button class="btn btn-warning editar-peso" data-id="{{ $peso->id }}">
+                                <i class="fa fa-pen"></i>
+                            </button>
+                        @else
+                            <button class="btn btn-secondary" disabled title="No editable">
+                                <i class="fa fa-lock"></i>
+                            </button>
+                        @endif
+
+                    </td>
+                    <td>{{ $peso->usuario?->name ?? '' }}</td>
                 </tr>
             @empty
                 <tr>
                     <td colspan="14" class="text-center text-muted py-4">
-                        <i class="bi bi-inbox"></i> No hay registros
+                        <i class="fa fa-inbox"></i> No hay registros
                     </td>
                 </tr>
             @endforelse

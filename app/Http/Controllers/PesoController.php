@@ -11,6 +11,13 @@ use App\Models\PsLotePeso;
 
 class PesoController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('permission:ver pesos')->only(['index', 'pesosByProgramacion', 'pesos']);
+        $this->middleware('permission:editar pesos')->only(['update', 'massUpdate']);
+        $this->middleware('permission:gestionar pesos');
+    }
+
     public function index()
     {
         $estados = PsEstado::all();

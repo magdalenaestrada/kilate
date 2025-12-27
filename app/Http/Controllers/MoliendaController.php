@@ -21,6 +21,10 @@ use Illuminate\Support\Facades\DB;
 
 class MoliendaController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('permission:gestionar molienda');
+    }
     public function index()
     {
         $procesos = Proceso::with(['lote', 'pesos', 'molienda'])

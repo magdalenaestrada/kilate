@@ -20,6 +20,22 @@ use Illuminate\Support\Facades\DB;
 class ProcesoController extends Controller
 
 {
+
+    public function __construct()
+    {
+        $this->middleware('permission:ver procesos')->only(['index', 'show', 'edit']);
+        $this->middleware('permission:crear procesos')->only(['create', 'store', 'guardar_consumo']);
+        $this->middleware('permission:editar procesos')->only([
+            'update',
+            'actualizar_consumo',
+            'actualizar_devolucion',
+            'finalizar'
+        ]);
+        $this->middleware('permission:eliminar procesos')->only(['destroy']);
+        $this->middleware('permission:gestionar procesos');
+        
+    }
+
     public function index()
     {
         $procesos = Proceso::with(['lote', 'programacion'])
@@ -108,10 +124,6 @@ class ProcesoController extends Controller
         if ($proceso->pesosotrabal && $proceso->pesosotrabal->count() > 0) {
             $proceso->peso_total = $proceso->pesos->pluck('Neto')->sum() + $proceso->pesosotrabal->pluck('Neto')->sum();
             $proceso->save();
-        }
-
-        if ($proceso->liquidacion) {
-            return response()->json(['error' => 'El proceso está liquidado y no se puede editar.'], 403);
         }
 
         return view('procesos.edit', compact('proceso', 'reactivos', 'stock_reactivos', 'todos_reactivos'));

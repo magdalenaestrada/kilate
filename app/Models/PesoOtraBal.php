@@ -30,7 +30,8 @@ class PesoOtraBal extends Model
         'lote_id',
         'proceso_id',
         'programacion_id',
-        'estado_id'
+        'estado_id',
+        'usuario_id'
     ];
 
     public function proceso()
@@ -47,6 +48,8 @@ class PesoOtraBal extends Model
     {
         return $this->belongsTo(PsEstado::class, 'estado_id');
     }
-
-    
+    public function usuario()
+    {
+        return $this->belongsTo(User::class, 'usuario_id');
+    }
 }

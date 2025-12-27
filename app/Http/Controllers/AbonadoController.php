@@ -11,11 +11,23 @@ use Illuminate\Validation\Rule;
 class AbonadoController extends Controller
 {
 
-    
-    
+
+
     public function __construct()
-    { 
-        $this->middleware('permission:use pagos tickets comedor');
+    {
+        $this->middleware('permission:use pagos tickets comedor')
+            ->only([
+                'index',
+                'create',
+                'store',
+                'show',
+                'prnpriview',
+            ]);
+
+        $this->middleware('permission:quitar ranchos abonado')
+            ->only([
+                'quitarRanchos',
+            ]);
     }
 
     /**
@@ -26,17 +38,10 @@ class AbonadoController extends Controller
         $abonados = Abonado::orderBy('created_at', 'desc')->paginate(20);
 
 
-           
+
         $ranchos = Rancho::has('abonados')->get(); // Only retrieve ranchos with abonados
 
-        foreach ($ranchos as $rancho) {
-            $rancho->cancelado = 'si';
-            $rancho->save();
 
-
-        }
-
-        
 
         return view('abonados.index', compact('abonados'));
     }
@@ -66,15 +71,14 @@ class AbonadoController extends Controller
             return false;
         });
 
-        
+
         $ranchos = Rancho::where(function ($query) {
-                $query->where('cancelado', '!=', 'si');
-            })
+            $query->where('cancelado', '!=', 'si');
+        })
             ->get();
 
 
         return view('abonados.create', compact('lotes', 'ranchos'));
-
     }
     /**
      * Store a newly created resource in storage.
@@ -85,18 +89,18 @@ class AbonadoController extends Controller
             'lotes' => 'required|array',
             'fecha_cancelacion' => 'required',
             'ranchos' => 'required',
-            
+
         ]);
 
-       
+
         // Create a new Programacion instance
         $abonado = new Abonado();
         // Attach existing Registro records to the Programacion
         $abonado->fecha_cancelacion = $request->fecha_cancelacion;
         $abonado->usuario = auth()->user()->name;
-      
 
-       
+
+
         // Set other attributes as needed...
         $abonado->save();
 
@@ -117,22 +121,42 @@ class AbonadoController extends Controller
 
 
         return redirect()->route('abonados.index')->with('crear-abonado-cancelar-tickets', 'Se cancelaron los tickets de comedor exitosamente.');
-
-
     }
 
-    /**
-     * Display the specified resource.
-     */
+    public function quitarRanchos(Request $request, Abonado $abonado)
+    {
+        $request->validate([
+            'ranchos' => 'required|array',
+        ]);
+
+        $ranchoIds = $request->ranchos;
+
+        $abonado->ranchos()->detach($ranchoIds);
+
+        Rancho::whereIn('id', $ranchoIds)
+            ->update(['cancelado' => 'no']);
+
+        if ($abonado->ranchos()->count() === 0) {
+            $abonado->delete();
+        }
+
+        return redirect()
+            ->route('abonados.index')
+            ->with(
+                'success',
+                'Ranchos quitados del pago correctamente.'
+            );
+    }
+
     public function show(abonado $abonado)
     {
 
 
         $ranchos = $abonado->ranchos;
         $sum_cantidad_total = $ranchos->sum('cantidad');
-       
 
-        
+
+
 
         // programacion with productos relations
         $abonado = Abonado::with('ranchos')->find($abonado->id);
@@ -140,7 +164,7 @@ class AbonadoController extends Controller
 
 
 
-        
+
 
         return view('abonados.show', compact('ranchos', 'abonado', 'sum_cantidad_total'));
     }
@@ -149,19 +173,12 @@ class AbonadoController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
-    {
-
-     
-        
-    }
+    public function edit(string $id) {}
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
-    {
-    }
+    public function update(Request $request, string $id) {}
 
     /**
      * Remove the specified resource from storage.
@@ -176,20 +193,19 @@ class AbonadoController extends Controller
 
     public function prnpriview(string $id)
     {
-         // programacion with productos relations
+        // programacion with productos relations
         $abonado = Abonado::findOrFail($id);
 
         $ranchos = $abonado->ranchos;
         $sum_cantidad_total = $ranchos->sum('cantidad');
-       
 
-        
 
-       
-       
-       
-        
+
+
+
+
+
+
         return view('abonados.printticket', compact('abonado', 'sum_cantidad_total'));
-        
     }
 }

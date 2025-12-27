@@ -13,6 +13,17 @@ use Illuminate\Http\Request;
 class PesoOtraBalController extends Controller
 {
 
+    public function __construct()
+    {
+        $this->middleware('permission:ver otros pesos')->only(['index', 'show', 'pesos', 'pesosOtrasLote']);
+        $this->middleware('permission:crear otros pesos')->only(['guardar', 'store']);
+        $this->middleware('permission:editar otros pesos')->only(['update']);
+        $this->middleware('permission:eliminar otros pesos')->only(['destroy']);
+        $this->middleware('permission:guardar molienda otros pesos')->only(['guardar_molienda']);
+        $this->middleware('permission:gestionar otros pesos');
+    }
+
+
     public function index()
     {
         $estados = PsEstado::all();
@@ -109,6 +120,8 @@ class PesoOtraBalController extends Controller
             'balanza' => $request->balanza,
             'razon_social_id' => $razon_id,
             'estado_id' => 1,
+            'usuario_id' => Auth()->id(),
+
         ]);
 
         return response()->json([
@@ -144,6 +157,7 @@ class PesoOtraBalController extends Controller
             'proceso_id' => $programacion->proceso_id,
             'programacion_id' => $id,
             'estado_id' => 1,
+            'usuario_id' => Auth()->id(),
         ]);
 
         $proceso = Proceso::findOrFail($programacion->proceso_id);
@@ -183,10 +197,32 @@ class PesoOtraBalController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+
+    public function show($id)
     {
-        //
+        return response()->json(
+            PesoOtraBal::select(
+                'id',
+                'lote_id',
+                'fechai',
+                'fechas',
+                'producto',
+                'conductor',
+                'placa',
+                'origen',
+                'destino',
+                'balanza',
+                'bruto',
+                'tara',
+                'neto',
+                'guia',
+                'guiat',
+                'observacion'
+            )->with('lote')->findOrFail($id)
+        );
     }
+
+
 
     /**
      * Show the form for editing the specified resource.
@@ -199,41 +235,49 @@ class PesoOtraBalController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request)
+
+    public function update(Request $request, $id)
     {
+        $peso = PesoOtraBal::findOrFail($id);
 
+        if ($peso->estado_id != 1) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Solo se puede editar un peso en estado CANCHA'
+            ], 403);
+        }
 
-        $pesootrabal = PesoOtraBal::findOrFail($request->pesoId);
-
-        $validated = $request->validate(rules: [
-            'neto' => 'required',
+        $request->validate([
+            'neto' => 'required|numeric',
+            'lote_id' => 'required|exists:lotes,id',
         ]);
 
+        $razon_id = Lote::findOrFail($request->lote_id)->lq_cliente_id;
 
-
-        $pesootrabal->update([
-            'Fechai'       => $request->fechai,
-            'Fechas'       => $request->fechas,
-            'Bruto'        => $request->bruto,
-            'Tara'         => $request->tara,
-            'Neto'         => $request->neto,
-            'Placa'        => $request->placa,
-            'Observacion'  => $request->observacion,
-            'Producto'     => $request->producto,
-            'Conductor'    => $request->conductor,
-            'Razonsocial'  => $request->razonsocial,
-            'Guiar'        => $request->guiar,
-            'Guiat'        => $request->guiat,
-            'Origen'       => $request->origen,
-            'Destino'      => $request->destino,
-            'Balanza'      => $request->balanza,
+        $peso->update([
+            'lote_id'     => $request->lote_id,
+            'razon_social_id' => $razon_id,
+            'fechai'      => $request->fechai ? str_replace('T', ' ', $request->fechai) : null,
+            'fechas'      => $request->fechas ? str_replace('T', ' ', $request->fechas) : null,
+            'bruto'       => $request->bruto ?? 0,
+            'tara'        => $request->tara ?? 0,
+            'neto'        => $request->neto,
+            'placa'       => $request->placa,
+            'observacion' => $request->observacion,
+            'producto'    => $request->producto,
+            'conductor'   => $request->conductor,
+            'guia'        => $request->guia,
+            'guiat'       => $request->guiat,
+            'origen'      => $request->origen,
+            'destino'     => $request->destino,
+            'balanza'     => $request->balanza,
         ]);
 
-        // Optionally, return a response or redirect after update
-        $pesootrabal->save();
+        return response()->json([
+            'success' => true,
+            'message' => 'Peso actualizado correctamente'
+        ]);
     }
-
-
 
     /**
      * Remove the specified resource from storage.

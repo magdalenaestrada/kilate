@@ -190,6 +190,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('export-excel-reportescuentas', [TsReporteDiarioCuentasController::class, 'export_excel'])->name('tsreportescuentas.export-excel');
     Route::get('export-contable-excel-reportescuentas', [TsReporteDiarioCuentasController::class, 'export_excel_contable'])->name('tsreporteContablecuentas.export-excel');
 
+    Route::post('abonados/{abonado}/quitar-ranchos',[AbonadoController::class, 'quitarRanchos'])->name('abonados.quitarRanchos');
 
     //ANULAR ROUTES
     Route::get('/inventarioingresos/{id}/anular', [InventarioingresoController::class, 'anular'])->name('inventarioingresos.anular');
@@ -364,6 +365,8 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('/otras-balanza/{id}', [PesoOtraBalController::class, 'store'])->name('otrasBalanza.store');
     Route::post('/otras-balanza/{id}/molienda', [PesoOtraBalController::class, 'guardar_molienda'])->name('otrasBalanza.guardar_molienda');
     Route::delete('/otras-balanza/{id}', [PesoOtraBalController::class, 'destroy'])->name('otrasBalanza.destroy');
+    Route::put('/otras-balanza/{id}', [PesoOtraBalController::class, 'update'])->name('otrasBalanza.update');
+    Route::get('/otras-balanza/{id}', [PesoOtraBalController::class, 'show'])->name('otrasBalanza.show');
 });
 
 Route::get('/', function () {

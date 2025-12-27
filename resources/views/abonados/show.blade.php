@@ -21,7 +21,7 @@
                     </div>
                     <div class="card-body">
                         <div class="row">
-                            
+
                             <div class="form-group col-md-3 g-3">
                                 <label for="fecha_cancelacion">
                                     {{ __('FECHA DE PAGO') }}
@@ -37,7 +37,7 @@
                                 $datos_cliente = $rancho->datos_cliente;
 
                             @endphp
-                            
+
                             <div class="form-group col-md-4 g-3">
                                 <label for="datos_cliente">
                                     {{ __('DATOS CLIENTE') }}
@@ -45,139 +45,159 @@
                                 <input class="form-control" value="{{ $datos_cliente }}" disabled>
                             </div>
 
-                            <div class="mt-1 table-responsive">
-                                @if (count($abonado->ranchos) > 0)
-                                    <table class="table table-striped table-hover">
-                                        <thead>
-                                            <tr class="text-center">
-
-                                                <th scope="col">
-                                                    {{ __('ID') }}
-                                                </th>
-
-                                
-
-                                                <th scope="col">
-                                                    {{ __('DOCUMENTO TRABAJADOR') }}
-                                                </th>
-                                                <th scope="col">
-                                                    {{ __('DATOS TRABAJADOR') }}
-                                                </th>
-
-                                                <th scope="col">
-                                                    {{ __('CANTIDAD') }}
-                                                </th>
-
-                                                
-
-                                                <th scope="col">
-                                                    {{ __('CANCELADO') }}
-                                                </th>
-
-                                                <th scope="col">
-                                                    {{ __('COMIDA') }}
-                                                </th>
-                                                <th scope="col">
-                                                    {{ __('LOTE') }}
-                                                </th>
-                                              
-
-                                                <th scope="col">
-                                                    {{ __('FECHA CREACIÓN') }}
-                                                </th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            @foreach ($abonado->ranchos as $rancho)
+                            <form action="{{ route('abonados.quitarRanchos', $abonado->id) }}" method="POST">
+                                @csrf
+                                <div class="mt-1 table-responsive">
+                                    @if (count($abonado->ranchos) > 0)
+                                        <table class="table table-striped table-hover">
+                                            <thead>
                                                 <tr class="text-center">
-                                                    <td scope="row">
-                                                        {{ $rancho->id }}
-                                                    </td>
+
+                                                    <th scope="col">
+                                                        <input type="checkbox" id="checkAll">
+                                                    </th>
+
+                                                    <th scope="col">
+                                                        {{ __('ID') }}
+                                                    </th>
 
 
-                                       
 
-                                                    <td scope="row">
-                                                        @if ($rancho->documento_trabajador)
-                                                            {{ $rancho->documento_trabajador }}
-                                                        @else
-                                                            -
-                                                        @endif
-                                                    </td>
+                                                    <th scope="col">
+                                                        {{ __('DOCUMENTO TRABAJADOR') }}
+                                                    </th>
+                                                    <th scope="col">
+                                                        {{ __('DATOS TRABAJADOR') }}
+                                                    </th>
 
-                                                    <td scope="row">
-                                                        @if ($rancho->datos_trabajador)
-                                                            {{ $rancho->datos_trabajador }}
-                                                        @else
-                                                            -
-                                                        @endif
-                                                    </td>
+                                                    <th scope="col">
+                                                        {{ __('CANTIDAD') }}
+                                                    </th>
+                                                    <th scope="col">
+                                                        {{ __('TICKET') }}
+                                                    </th>
 
-                                                    <td scope="row">
-                                                        {{ $rancho->cantidad }}
-                                                    </td>
-                                                    <td>
-                                                        @if($rancho->abonados)
-                                                        {{ $rancho->id }}
-                                                        @endif
-                                                    </td>   
 
-                                                    
+                                                    <th scope="col">
+                                                        {{ __('CANCELADO') }}
+                                                    </th>
 
-                                                    <td scope="row">
-                                                        {{ $rancho->cancelado }}
-                                                    </td>
+                                                    <th scope="col">
+                                                        {{ __('COMIDA') }}
+                                                    </th>
+                                                    <th scope="col">
+                                                        {{ __('LOTE') }}
+                                                    </th>
 
-                                                    <td scope="row">
-                                                        {{ $rancho->comida->nombre }}
-
-                                                    </td>
-                                                    
-                                                    <td scope="row">
-                                                        {{ $rancho->lote }}
-
-                                                    </td>
-                                                    
-                                                    <td scope="row">
-                                                        {{ $rancho->created_at }}
-
-                                                    </td>
+                                                    <th scope="col">
+                                                        {{ __('FECHA CREACIÓN') }}
+                                                    </th>
                                                 </tr>
-                                            @endforeach
-                                        </tbody>
-
-                                    </table>
-                                @endif
-
-
-                                <p class="col-md-12 text-end g-3 h3 mt-3">Cantidad: {{ $sum_cantidad_total }}</p>
-
-                            </div>
-
-
-
-                            <a href="{{ route('cancelacion.prnpriview', $abonado->id) }}"
-                                class="btnprn btn btn-info">IMPRIMIR</a>
+                                            </thead>
+                                            <tbody>
+                                                @foreach ($abonado->ranchos as $rancho)
+                                                    <tr class="text-center">
+                                                        <td>
+                                                            <input type="checkbox" name="ranchos[]"
+                                                                value="{{ $rancho->id }}" class="check-item">
+                                                        </td>
+                                                        <td scope="row">
+                                                            {{ $rancho->id }}
+                                                        </td>
 
 
 
 
+                                                        <td scope="row">
+                                                            @if ($rancho->documento_trabajador)
+                                                                {{ $rancho->documento_trabajador }}
+                                                            @else
+                                                                -
+                                                            @endif
+                                                        </td>
 
+                                                        <td scope="row">
+                                                            @if ($rancho->datos_trabajador)
+                                                                {{ $rancho->datos_trabajador }}
+                                                            @else
+                                                                -
+                                                            @endif
+                                                        </td>
+
+                                                        <td scope="row">
+                                                            {{ $rancho->cantidad }}
+                                                        </td>
+                                                        <td>
+                                                            @if ($rancho->abonados)
+                                                                {{ $rancho->id }}
+                                                            @endif
+                                                        </td>
+
+
+
+                                                        <td scope="row">
+                                                            {{ $rancho->cancelado }}
+                                                        </td>
+
+                                                        <td scope="row">
+                                                            {{ $rancho->comida->nombre }}
+
+                                                        </td>
+
+                                                        <td scope="row">
+                                                            {{ $rancho->lote }}
+
+                                                        </td>
+
+                                                        <td scope="row">
+                                                            {{ $rancho->created_at }}
+
+                                                        </td>
+                                                    </tr>
+                                                @endforeach
+                                            </tbody>
+
+                                        </table>
+                                    @endif
+                                    <button type="submit" class="btn btn-warning">
+                                        QUITAR DEL PAGO
+                                    </button>
+
+                            </form>
+
+                            <p class="col-md-12 text-end g-3 h3 mt-3">Cantidad: {{ $sum_cantidad_total }}</p>
 
                         </div>
+
+
+
+                        <a href="{{ route('cancelacion.prnpriview', $abonado->id) }}"
+                            class="btnprn btn btn-info">IMPRIMIR</a>
+
+
+
+
+
+
                     </div>
                 </div>
             </div>
         </div>
     </div>
+    </div>
 @endsection
 
-    @section('js')
-        <script type="text/javascript" src="{{ asset('js/jquery.printPage.js') }}"></script>
-        <script type="text/javascript">
-            $(document).ready(function() {
-                $('.btnprn').printPage();
+@section('js')
+    <script type="text/javascript" src="{{ asset('js/jquery.printPage.js') }}"></script>
+    <script type="text/javascript">
+        $(document).ready(function() {
+            $('.btnprn').printPage();
 
-            });
-        </script>
-    @endsection
+        });
+    </script>
+    <script>
+        $('#checkAll').on('change', function() {
+            $('.check-item').prop('checked', this.checked);
+        });
+    </script>
+@endsection

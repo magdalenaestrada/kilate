@@ -15,7 +15,7 @@
     <div class="col-md-2">
         <div class="combo">
             <input type="text" id="lote-masivo-input" class="form-control form-control-sm"
-                placeholder="Escriba o seleccione..." style="min-width: 150px;">
+                placeholder="Escriba o seleccione..." style="min-width: 150px;" autocomplete="off">
 
             <select id="lote-masivo-select" class="form-control form-control-sm" size="5"
                 style="display: none; min-width: 150px; text-align: left;">
@@ -71,7 +71,6 @@
                     $cancha = $estadoActual->id === 1;
                     $procesado = $estadoActual->id === 2;
 
-                    // Asignar clase de color de fila
                     $filaClase = '';
                     if ($liquidado) {
                         $filaClase = 'bg-liquidado';

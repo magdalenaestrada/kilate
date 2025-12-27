@@ -106,18 +106,24 @@
 
 @push('scripts')
     <script>
+        // ✅ Función helper para formatear fechas
+        function formatDateForInput(dateString) {
+            if (!dateString) return '';
+            if (dateString.includes('T')) {
+                return dateString.substring(0, 16);
+            }
+            return dateString.replace(' ', 'T').substring(0, 16);
+        }
+
         document.addEventListener("DOMContentLoaded", () => {
             const btn = document.getElementById("btnAbrirModal");
-            const modalEl = document.getElementById("modalPesoOtraBalanza");
-
+            const modalEl = document.getElementById('modalPesoOtraBalanza');
             const modal = new bootstrap.Modal(modalEl);
 
             btn.addEventListener("click", () => {
                 modal.show();
             });
-        });
 
-        document.addEventListener("DOMContentLoaded", () => {
             const filtrosForm = document.getElementById("filtros");
             const tablaContainer = document.querySelector("#tabla-container");
 
@@ -148,46 +154,10 @@
                 cargarTabla();
             });
 
+            // ✅ CORRECCIÓN 1: Usar la instancia existente
             document.getElementById('btnCerrarModal')?.addEventListener('click', () => {
-                $('#modalPesoOtraBalanza').modal('close');
+                modal.hide();
             });
-            document.getElementById('btnGuardar').addEventListener('click', async () => {
-                const loteId = document.getElementById('lote_id_real').value;
-
-                if (!loteId) {
-                    return Swal.fire(
-                        'Lote inválido',
-                        'Debes seleccionar un lote de la lista',
-                        'warning'
-                    );
-                }
-
-                const form = document.getElementById('formPesoManual');
-                const formData = new FormData(form);
-
-                try {
-                    const res = await fetch("{{ route('otrasBalanza.guardar') }}", {
-                        method: 'POST',
-                        headers: {
-                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                        },
-                        body: formData
-                    });
-
-                    const data = await res.json();
-
-                    if (data.success) {
-                        Swal.fire('Guardado', 'Peso registrado correctamente', 'success');
-                        form.reset();
-                        document.getElementById('lote_id_real').value = '';
-                    }
-
-                } catch (e) {
-                    Swal.fire('Error', 'No se pudo guardar', 'error');
-                }
-            });
-
-
 
             $(document).on('input', '#formPesoManual input[name="bruto"], #formPesoManual input[name="tara"]',
                 function() {
@@ -210,25 +180,13 @@
                 if (!btn) return;
 
                 const pesoId = btn.dataset.peso;
-                const estadoSelect = document.querySelector(`.estado-select[data-peso="${pesoId}"]`);
                 const inputLote = document.querySelector(`.lote-input[data-peso="${pesoId}"]`);
                 const selectLote = inputLote.closest('.combo').querySelector('.lote-select');
-                const estadoId = estadoSelect?.value;
                 const loteNombre = inputLote?.value.trim();
                 const option = Array.from(selectLote.options)
                     .find(opt => opt.text.trim().toLowerCase() === loteNombre.toLowerCase());
 
                 const loteId = option ? option.value : null;
-
-                if (!estadoId || !loteNombre) {
-                    Swal.fire({
-                        icon: 'warning',
-                        title: 'Campos incompletos',
-                        text: 'Por favor selecciona un estado y escribe un lote válido.',
-                        confirmButtonColor: '#3085d6'
-                    });
-                    return;
-                }
 
                 if (!loteId) {
                     Swal.fire({
@@ -241,16 +199,12 @@
                 }
 
                 try {
-                    const res = await fetch(`{{ route('pesos.update', '') }}/${pesoId}`, {
+                    const res = await fetch(`{{ route('otrasBalanza.update', '') }}/${pesoId}`, {
                         method: 'PUT',
                         headers: {
                             'X-CSRF-TOKEN': '{{ csrf_token() }}',
                             'Content-Type': 'application/json'
                         },
-                        body: JSON.stringify({
-                            estadoId,
-                            loteId
-                        })
                     });
 
                     const result = await res.json();
@@ -267,7 +221,8 @@
                         const fila = btn.closest('tr');
                         fila.classList.add('table-success');
 
-                        estadoSelect.disabled = true;
+                        const estadoSelect = fila.querySelector('.estado-select');
+                        if (estadoSelect) estadoSelect.disabled = true;
                         inputLote.disabled = true;
                         btn.disabled = true;
                         btn.classList.remove('btn-success');
@@ -286,6 +241,101 @@
                         confirmButtonColor: '#d33'
                     });
                 }
+            });
+
+            document.getElementById("btnAbrirModal").addEventListener("click", () => {
+                editandoId = null;
+                const form = document.getElementById('formPesoManual');
+                form.reset();
+                document.getElementById('lote_id_real').value = '';
+                document.getElementById('lote_id_input').value = '';
+                modal.show();
+            });
+
+            let editandoId = null;
+
+            document.getElementById('btnGuardar').addEventListener('click', async () => {
+                const form = document.getElementById('formPesoManual');
+                const loteId = document.getElementById('lote_id_real').value;
+
+                if (!loteId) {
+                    return Swal.fire('Lote inválido', 'Selecciona un lote válido', 'warning');
+                }
+
+                const formData = new FormData(form);
+                formData.append('lote_id', loteId);
+
+                let url = "{{ route('otrasBalanza.guardar') }}";
+                let method = "POST";
+
+                if (editandoId) {
+                    url = `/otras-balanza/${editandoId}`;
+                    method = "POST";
+                    formData.append('_method', 'PUT');
+                }
+
+                try {
+                    const res = await fetch(url, {
+                        method,
+                        headers: {
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        },
+                        body: formData
+                    });
+
+                    const data = await res.json();
+
+                    if (res.ok && data.success) {
+                        Swal.fire('Éxito', editandoId ? 'Peso actualizado' : 'Peso registrado',
+                            'success');
+                        form.reset();
+                        editandoId = null;
+
+                        // ✅ CORRECCIÓN 2: Usar Bootstrap nativo
+                        modal.hide();
+
+                        cargarTabla();
+                    } else {
+                        Swal.fire('Error', data.message || 'No se pudo guardar', 'error');
+                    }
+
+                } catch (e) {
+                    console.error('Error completo:', e);
+                    Swal.fire('Error', 'No se pudo guardar: ' + e.message, 'error');
+                }
+            });
+
+            document.addEventListener("click", async e => {
+                const btn = e.target.closest('.editar-peso');
+                if (!btn) return;
+
+                editandoId = btn.dataset.id;
+
+                const res = await fetch(`/otras-balanza/${editandoId}`);
+                const data = await res.json();
+
+                const form = document.getElementById('formPesoManual');
+
+                document.getElementById('lote_id_real').value = data.lote_id;
+                document.getElementById('lote_id_input').value = data.lote?.nombre ?? '';
+
+                // ✅ CORRECCIÓN 3: Formatear fechas correctamente
+                form.querySelector('[name="fechai"]').value = formatDateForInput(data.fechai);
+                form.querySelector('[name="fechas"]').value = formatDateForInput(data.fechas);
+                form.querySelector('[name="producto"]').value = data.producto ?? '';
+                form.querySelector('[name="conductor"]').value = data.conductor ?? '';
+                form.querySelector('[name="placa"]').value = data.placa ?? '';
+                form.querySelector('[name="origen"]').value = data.origen ?? '';
+                form.querySelector('[name="destino"]').value = data.destino ?? '';
+                form.querySelector('[name="balanza"]').value = data.balanza ?? '';
+                form.querySelector('[name="bruto"]').value = data.bruto ?? 0;
+                form.querySelector('[name="tara"]').value = data.tara ?? 0;
+                form.querySelector('[name="neto"]').value = data.neto ?? 0;
+                form.querySelector('[name="guia"]').value = data.guia ?? '';
+                form.querySelector('[name="guiat"]').value = data.guiat ?? '';
+                form.querySelector('[name="observacion"]').value = data.observacion ?? '';
+
+                modal.show();
             });
 
             $(document).on('input', '#lote_id_input', function() {
@@ -309,7 +359,6 @@
 
             $(document).on('change', '#lote_id', function() {
                 const option = $(this).find('option:selected');
-
                 $('#lote_id_input').val(option.text().trim());
                 $('#lote_id_real').val(option.val());
                 $(this).hide();
@@ -320,7 +369,6 @@
                     $('#lote_id').hide();
                 }
             });
-
 
             $(document).ready(function() {
                 $(document).on('input', '.lote-input', function() {
@@ -368,54 +416,9 @@
                 }
             });
 
-            document.addEventListener("click", async e => {
-
-                if (e.target.id !== "btn-asignar-masivo") return;
-
-                const seleccionados = [...document.querySelectorAll(".check-item:checked")]
-                    .map(c => c.value);
-
-                const estado = document.getElementById("estado-masivo").value;
-                const lote = document.getElementById("lote-masivo-id").value;
-
-                if (seleccionados.length === 0) {
-                    return Swal.fire("Sin selección", "Selecciona al menos un registro.", "warning");
-                }
-
-                if (!estado || !lote) {
-                    return Swal.fire("Campos incompletos", "Debe elegir lote y estado.", "warning");
-                }
-
-                try {
-                    const res = await fetch("{{ route('pesos.massUpdate') }}", {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json",
-                            "X-CSRF-TOKEN": "{{ csrf_token() }}"
-                        },
-                        body: JSON.stringify({
-                            pesos: seleccionados,
-                            estado,
-                            lote
-                        })
-                    });
-
-                    const data = await res.json();
-
-                    Swal.fire("Éxito", data.message, "success");
-
-                    cargarTabla();
-
-                } catch (err) {
-                    Swal.fire("Error", "Ocurrió un error inesperado", "error");
-                }
-            });
-
             $(document).on("input", "#lote-masivo-input", function() {
                 let filtro = $(this).val().toLowerCase();
-
                 $("#lote-masivo-select").show();
-
                 $("#lote-masivo-select option").each(function() {
                     let texto = $(this).text().toLowerCase();
                     $(this).toggle(texto.includes(filtro));
@@ -429,10 +432,8 @@
             $(document).on("click", "#lote-masivo-select option", function() {
                 let nombre = $(this).text();
                 let id = $(this).val();
-
                 $("#lote-masivo-input").val(nombre);
                 $("#lote-masivo-id").val(id);
-
                 $("#lote-masivo-select").hide();
             });
 

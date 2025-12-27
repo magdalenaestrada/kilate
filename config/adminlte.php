@@ -523,14 +523,6 @@ return [
         ],
 
         ['header' => 'EN DESARROLLO', 'can' => 'ver producto'],
-
-        [
-            'text' => 'Programaciones',
-            'icon_color' => 'yellow',
-            'url' => '/programacion',
-            'can' => 'usar programaciones',
-
-        ],
         [
             'text' => 'Registros',
             'icon_color' => 'cyan',

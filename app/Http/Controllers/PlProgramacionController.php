@@ -16,6 +16,10 @@ use Illuminate\Support\Facades\DB;
 
 class PlProgramacionController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('permission:gestionar programaciones');
+    }
     public function index()
     {
         $lotes = Lote::with('pesos', 'pesos.estado', 'pesos.proceso')->get();
@@ -31,7 +35,7 @@ class PlProgramacionController extends Controller
                     'lote_id' => $p->proceso->lote->id ?? null,
                     'lote_nombre' => $p->proceso->lote->nombre ?? 'N/A',
                     'circuito' => $p->proceso->circuito ?? 'N/A',
-                    'estado' => $p->estado, // o el campo que corresponda
+                    'estado' => $p->proceso->estado ?? 'P', // o el campo que corresponda
                     'pesos' => $p->proceso->pesos->pluck('NroSalida')->toArray()
                 ];
             });

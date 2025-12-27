@@ -96,7 +96,7 @@
             });
 
             calendar.render();
-            recolorearPorCircuito();
+            recolorearPorEstado();
             aplicarFiltros();
 
             $('#btnNuevaProgramacion').click(() => {
@@ -401,18 +401,20 @@
                         const tablaBody = $('#tablaPesos tbody');
                         tablaBody.html('');
 
+                        const estadoProceso = p.proceso.estado;
+                        console.log('Estado del proceso:', estadoProceso); // Para debugging
+
                         if (pesosBalanza.length === 0) {
                             tablaBody.html(
                                 '<tr><td colspan="8" class="text-muted">No hay pesos de balanza principal asignados</td></tr>'
                             );
                         } else {
                             pesosBalanza.forEach(peso => {
-                                // Deshabilitar si el estado NO es CANCHA (estado_id !== 1)
-                                const disabled = (peso.estado_id !== 1) ? 'disabled' : '';
-                                const estadoClass = (peso.estado_id !== 1) ? 'bg-warning' : '';
+                                const disabled = (estadoProceso !== 'P') ? 'disabled' : '';
+                                const estadoClass = (estadoProceso !== 'P') ? '' : '';
 
                                 tablaBody.append(`
-                        <tr>
+                        <tr class="${estadoClass}">
                             <td>
                                 <input type="checkbox" 
                                        class="peso-check" 
@@ -433,7 +435,7 @@
                             });
                         }
 
-                        cargarTablaOtrasBalanzas(pesosOtrasBalanzas);
+                        cargarTablaOtrasBalanzas(pesosOtrasBalanzas, estadoProceso);
 
                         calcularTotal();
                         modal.show();
@@ -445,8 +447,7 @@
                     });
             });
 
-
-            function cargarTablaOtrasBalanzas(pesosOtrasBalanzas) {
+            function cargarTablaOtrasBalanzas(pesosOtrasBalanzas, estadoProceso) {
                 const tablaOtrasBody = $('#tablaOtrasBalanzas tbody');
                 tablaOtrasBody.html('');
 
@@ -456,13 +457,11 @@
                     );
                 } else {
                     pesosOtrasBalanzas.forEach(peso => {
-                        // Deshabilitar checkbox si el estado NO es CANCHA (estado_id !== 1)
-                        const checkboxDisabled = (peso.estado_id !== 1) ? 'disabled' : '';
-                        const estadoClass = (peso.estado_id !== 1) ? 'bg-warning' : '';
+                        const checkboxDisabled = (estadoProceso !== 'P') ? 'disabled' : '';
+                        const estadoClass = (estadoProceso !== 'P') ? 'bg-' : '';
 
                         let botonEliminar = '';
-                        if (peso.estado_id === 1) {
-                            // Solo se puede eliminar si está en CANCHA
+                        if (estadoProceso === 'P') {
                             botonEliminar = `
                     <button class="btn btn-sm btn-danger btn-eliminar-otra-balanza" 
                             data-id="${peso.id}"
@@ -474,14 +473,14 @@
                             botonEliminar = `
                     <button class="btn btn-sm btn-secondary" 
                             disabled 
-                            title="No se puede eliminar. Estado: ${peso.estado_nombre || 'N/A'}">
+                            title="No se puede eliminar. Estado: ${estadoProceso}">
                         <i class="fa fa-lock"></i>
                     </button>
                 `;
                         }
 
                         tablaOtrasBody.append(`
-                <tr>
+                <tr class="${estadoClass}">
                     <td>
                         <input type="checkbox" 
                                class="peso-otra-check" 
@@ -506,8 +505,6 @@
                     });
                 }
             }
-
-
 
             $(document).on('click', '#btnAgregarPesoManual', function() {
                 const programacionId = $('#programacion_id').val();
@@ -571,15 +568,14 @@
                                                 );
                                             } else {
                                                 pesosBalanza.forEach(peso => {
-                                                    // Deshabilitar si el estado NO es CANCHA (estado_id !== 1)
                                                     const disabled = (peso
                                                             .estado_id !== 1
-                                                            ) ? 'disabled' :
+                                                        ) ? 'disabled' :
                                                         '';
                                                     const estadoClass = (
                                                             peso
                                                             .estado_id !== 1
-                                                            ) ?
+                                                        ) ?
                                                         'bg-warning' : '';
 
                                                     tablaBody.append(`
@@ -720,27 +716,32 @@
         }
 
 
-        function recolorearPorCircuito() {
+        function recolorearPorEstado() {
             calendar.getEvents().forEach(e => {
-                const circuito = e.extendedProps.circuito;
-                let color = '#4dabf7';
+                const estado = e.extendedProps.estado;
+                let color = '#6c757d';
+                let textColor = '#fff';
 
-                switch (circuito) {
-                    case 'A':
-                        color = '#AADC77';
-                        break; // azul
-                    case 'B':
-                        color = '#F9E6AE';
-                        break; // naranja
-                    case 'C':
-                        color = '#20c997';
-                        break; // verde
+                switch (estado) {
+                    case 'P':
+                        color = '#28a745';
+                        textColor = '#fff';
+                        break;
+                    case 'F':
+                        color = '#ffc107';
+                        textColor = '#000';
+                        break;
+                    case 'L':
+                        color = '#DEDDDE';
+                        textColor = '#6c757d';
+                        break;
                     default:
-                        color = '#4dabf7';
+                        color = '#62757d';
+                        textColor = '#6c757d';
                 }
 
                 e.setProp('color', color);
-                e.setProp('textColor', '#000');
+                e.setProp('textColor', textColor);
             });
         }
 

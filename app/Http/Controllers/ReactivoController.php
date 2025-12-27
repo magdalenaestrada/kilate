@@ -14,6 +14,10 @@ use Inertia\Inertia;
 
 class ReactivoController extends Controller
 {
+      public function __construct()
+    {
+        $this->middleware('permission:gestionar reactivos');
+    }
     public function index()
     {
         $reactivos = Reactivo::with(['detalles', 'producto'])

@@ -204,8 +204,7 @@
                                             {{ __('FECHA DE EMISIÓN COMPROBANTE') }}
                                         </label>
                                         <input class="form-control form-control-sm" required id="fecha_emision"
-                                            type="date" name="fecha_emision"
-                                            max="{{ $hoy->format('Y-m-d') }}">
+                                            type="date" name="fecha_emision" max="{{ $hoy->format('Y-m-d') }}">
 
                                     </div>
 

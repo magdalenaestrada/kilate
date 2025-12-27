@@ -14,6 +14,11 @@ use Termwind\Components\Li;
 
 class LiquidacionesController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('permission:gestionar liquidaciones');
+    }
+
     public function index()
     {
         $procesos = Proceso::with(['lote', 'programacion'])

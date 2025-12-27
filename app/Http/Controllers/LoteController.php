@@ -13,6 +13,15 @@ use Illuminate\Validation\ValidationException;
 
 class LoteController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('permission:ver lotes')->only(['index', 'show', 'pesosEnCancha']);
+        $this->middleware('permission:crear lotes')->only(['create', 'store']);
+        $this->middleware('permission:editar lotes')->only(['update']);
+        $this->middleware('permission:eliminar lotes')->only(['destroy']);
+        $this->middleware('permission:gestionar lotes');
+    }
+
     public function index()
     {
         $lotes = Lote::with('cliente')->orderBy('created_at', "desc")

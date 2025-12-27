@@ -15,17 +15,17 @@ tbody tr {
 
 
 .bg-liquidado {
-  background-color: #d1e7dd !important;
+  background-color: #f8d7da !important;
   color: #0f5132 !important;
 }
 
 .bg-retirado {
-  background-color: #f8d7da !important;
-  color: #842029 !important;
+  background-color: #cdcdcd !important;
+  color: #000000 !important;
 }
 
 .bg-cancha {
-  background-color: #cfe2ff !important;
+  background-color: #d1e7dd !important;
   color: #084298 !important;
 }
 
