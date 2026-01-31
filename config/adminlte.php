@@ -15,7 +15,7 @@ return [
     */
 
     'title' => '',
-    'title_prefix' => 'SISTEMA TERRA MINING |',
+    'title_prefix' => 'SISTEMA KILATE CORPORATION |',
     'title_postfix' => '',
 
     /*
@@ -63,12 +63,12 @@ return [
     |
     */
 
-    'logo' => '<b>TERRA MINING</b>',
-    'logo_img' => 'vendor/adminlte/dist/img/terra_mining.jpg',
+    'logo' => '<b>SISTEMA KILATE</b>',
+    'logo_img' => 'vendor/adminlte/dist/img/kilate.png',
     'logo_img_class' => 'brand-image  ',
     'logo_img_xl' => null,
     'logo_img_xl_class' => '',
-    'logo_img_alt' => 'TERRA MINING LOGO',
+    'logo_img_alt' => 'KILATE CORPORATION LOGO',
 
     /*
     |--------------------------------------------------------------------------
@@ -113,7 +113,7 @@ return [
         'enabled' => false,
         'mode' => 'fullscreen',
         'img' => [
-            'path' => 'vendor/adminlte/dist/img/terra_mining.jpg',
+            'path' => 'vendor/adminlte/dist/img/kilate.png',
             'alt' => 'Terra mining logo preloader imagw',
             'effect' => 'animation__shake',
             'width' => 60,
@@ -456,6 +456,11 @@ return [
             'text' => 'Liquidaciones',
             'can' => 'ver producto',
             'submenu' => [
+                [
+                    'text' => 'Circuitos',
+                    'url' => '/circuitos',
+                    'can' => 'ver producto',
+                ],
                 [
                     'text' => 'Lotes',
                     'url' => '/lotes',

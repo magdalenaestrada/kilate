@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->datetime("fecha_hora");
             $table->foreignId("usuario_id")->constrained("users");
-            $table->char("circuito");
+            $table->foreignId('circuito_id')->nullable()->constrained('circuitos');
             $table->foreignId("reactivo_id")->constrained("reactivos")->index();
             $table->decimal("stock");
             $table->timestamps();

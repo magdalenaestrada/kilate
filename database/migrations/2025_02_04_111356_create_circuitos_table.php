@@ -11,9 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('inv_salidasrapidas', function (Blueprint $table) {
-            $table->foreignId('circuito_id')->nullable()->constrained('circuitos');
-            $table->char("turno", 1)->nullable();
+        Schema::create('circuitos', function (Blueprint $table) {
+            $table->id();
+            $table->string("descripcion");
+            $table->timestamps();
         });
     }
 
@@ -22,8 +23,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('inv_salidasrapidas', function (Blueprint $table) {
-            //
-        });
+        Schema::dropIfExists('circuitos');
     }
 };

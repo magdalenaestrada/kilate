@@ -125,9 +125,9 @@ class LqClienteController extends Controller
         if ($ultimo_cliente) {
             $nuevo_codigo = str_pad(intval($ultimo_cliente->id) + 1, 4, '0', STR_PAD_LEFT);
             $anio = Carbon::now("America/Lima")->format("y");
-            $codigo = 'AG' . $anio . '-' . $nuevo_codigo;
+            $codigo = 'KC' . $anio . '-' . $nuevo_codigo;
         } else {
-            $codigo = 'AG-0001';
+            $codigo = 'KC-0001';
         }
         return $codigo;
     }

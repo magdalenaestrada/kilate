@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Models\Circuito;
 use App\Models\Producto;
 use App\Models\ProductosFamilia;
 use App\Models\Reactivo;
@@ -20,12 +21,17 @@ class ReactivoController extends Controller
     }
     public function index()
     {
-        $reactivos = Reactivo::with(['detalles', 'producto'])
-            ->whereRelation('producto', 'productosfamilia_id', 1)
+        $reactivos = Reactivo::with(['detalles', 'producto.familia'])
+            ->whereHas('producto.familia', function ($q) {
+                $q->where('nombre', 'Reactivos');
+            })
             ->orderBy('created_at')
             ->paginate(10);
 
-        $productos = Producto::where('productosfamilia_id', 1)->get();
+        $productos = Producto::whereHas('familia', function ($q) {
+            $q->where('nombre', 'Reactivos');
+        })
+            ->get();
 
         return view('reactivos.index', compact('reactivos', 'productos'));
     }
@@ -33,7 +39,9 @@ class ReactivoController extends Controller
     public function stock()
     {
         $stock_reactivos = StockReactivo::all();
-        return view("reactivos.stock", compact("stock_reactivos"));
+        $stockPorCircuito = $stock_reactivos->groupBy('circuito_id');
+
+        return view('reactivos.stock', compact('stockPorCircuito'));
     }
     /**
      * Show the form for creating a new resource.
@@ -113,25 +121,27 @@ class ReactivoController extends Controller
             ], 500);
         }
     }
-    public function reset_stock($circuito)
+    public function reset_stock($circuitoId)
     {
-        if (!in_array($circuito, ['A', 'B'])) {
-            abort(404);
-        }
+        $circuito = Circuito::findOrFail($circuitoId);
+
         $stocks = StockReactivo::with('reactivo.producto')
-            ->where('circuito', $circuito)
+            ->where('circuito_id', $circuito->id)
             ->get();
 
         foreach ($stocks as $stock) {
+            $cantidad = $stock->stock;
 
-            $antiguo_stock = $stock->stock; 
-            $producto = $stock->reactivo->producto;
-            $producto->increment("stock", $antiguo_stock);
+            $stock->reactivo->producto->increment('stock', $cantidad);
+
             $stock->update([
                 'stock' => 0
             ]);
         }
 
-        return back()->with('success', "Todo el stock del circuito $circuito ha sido devuelto");
+        return back()->with(
+            'success',
+            "Todo el stock del circuito {$circuito->nombre} ha sido devuelto"
+        );
     }
 }

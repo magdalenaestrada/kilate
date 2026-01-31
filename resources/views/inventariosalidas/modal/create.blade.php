@@ -1,4 +1,4 @@
-<div class="modal fade text-left" id="ModalCreate" role="dialog" aria-hidden="true">        
+<div class="modal fade text-left" id="ModalCreate" role="dialog" aria-hidden="true">
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <div class="card-header">
@@ -9,8 +9,9 @@
                         </h6>
                     </div>
                     <div class="col-md-6 text-end">
-                        <button type="button" style="font-size: 30px" class="close" data-dismiss="modal" aria-label="Close">
-                            <img style="width: 15px" src="{{asset('images/icon/close.png')}}" alt="cerrar">    
+                        <button type="button" style="font-size: 30px" class="close" data-dismiss="modal"
+                            aria-label="Close">
+                            <img style="width: 15px" src="{{ asset('images/icon/close.png') }}" alt="cerrar">
                         </button>
                     </div>
                 </div>
@@ -23,83 +24,88 @@
 
                     <table class="table table-bordered">
                         <thead class="text-center">
-                        <tr>
+                            <tr>
 
 
-                            <th>
-                                {{ __('PRODUCTO') }}
-                            </th>
+                                <th>
+                                    {{ __('PRODUCTO') }}
+                                </th>
 
-                            <th>
-                                {{ __('CANTIDAD') }}
-                            </th>
-
-                          
-                                                       
-                            <th>
-                                {{ __('UNIDAD') }}
-                            </th>
-
-                           
-                            
-
-                        
-                            <th>
-                                <button class="btn btn-sm btn-outline-dark" type="button" onclick="create_tr('table_body')" id="addMoreButton">
-                                    <img style="width: 11px" src="{{asset('images/icon/mas.png')}}" alt="más">
-                                </button>
-                            </th>
+                                <th>
+                                    {{ __('CANTIDAD') }}
+                                </th>
 
 
-                        </tr>
+
+                                <th>
+                                    {{ __('UNIDAD') }}
+                                </th>
+
+
+
+
+
+                                <th>
+                                    <button class="btn btn-sm btn-outline-dark" type="button"
+                                        onclick="create_tr('table_body')" id="addMoreButton">
+                                        <img style="width: 11px" src="{{ asset('images/icon/mas.png') }}"
+                                            alt="más">
+                                    </button>
+                                </th>
+
+
+                            </tr>
                         </thead>
 
                         <tbody id="table_body">
                             <tr>
                                 <td>
-                                    <select name="products[]" class="buscador form-control form-control-sm cart-product" style="width: 270px" required>
-                                            <option value="">{{ __('-- Seleccione una opción') }}</option>
-                                            @foreach ($productos as $producto)
-                                                <option value="{{ $producto->id }}"
-                                                    {{ old('producto_id') == $producto->id ? 'selected' : '' }}>
-                                                    {{ $producto->nombre_producto }}
-                                                </option>
-                                            @endforeach
+                                    <select name="products[]" class="buscador form-control form-control-sm cart-product"
+                                        style="width: 270px" required>
+                                        <option value="">{{ __('-- Seleccione una opción') }}</option>
+                                        @foreach ($productos as $producto)
+                                            <option value="{{ $producto->id }}"
+                                                {{ old('producto_id') == $producto->id ? 'selected' : '' }}>
+                                                {{ $producto->nombre_producto }}
+                                            </option>
+                                        @endforeach
                                     </select>
                                 </td>
 
                                 <td>
-                                <input name="qty[]" type="number" step="0.00"  placeholder="0" required
-                                class="form-control form-control-sm product-qty" value="1" style="max-width: 100px">
-                                </td>
-                                
-
-                                
-                                
-                                <td>
-                                        <input name="unidad[]" 
-                                        class="form-control form-control-sm product-unidad" disabled placeholder="" >
+                                    <input name="qty[]" type="number" step="0.00" placeholder="0" required
+                                        class="form-control form-control-sm product-qty" value="1"
+                                        style="max-width: 100px">
                                 </td>
 
-                                
 
 
-                               
+
                                 <td>
-                                    <button class="btn btn-sm btn-danger" onclick="remove_tr(this)" type="button">Quitar</button>
+                                    <input name="unidad[]" class="form-control form-control-sm product-unidad" disabled
+                                        placeholder="">
+                                </td>
+
+
+
+
+
+                                <td>
+                                    <button class="btn btn-sm btn-danger" onclick="remove_tr(this)"
+                                        type="button">Quitar</button>
 
                                 </td>
                             </tr>
                         </tbody>
-                    
 
-                    
+
+
 
 
                     </table>
-                                          
-    
-                       
+
+
+
 
 
                     <!-- For doc table -->
@@ -153,7 +159,7 @@
 
 
                         <div class="form-group col-md-4 g-3">
-                            <label for="area_solicitante" class="text-sm" >
+                            <label for="area_solicitante" class="text-sm">
                                 {{ __('AREA SOLICITANTE') }}
                             </label>
                             <span class="text-danger">(*)</span>
@@ -178,12 +184,12 @@
                             <span class="text-danger">(*)</span>
 
                             <input type="text" name="prioridad" id="prioridad"
-                                    class="form-control form-control-sm @error('prioridad') is-invalid @enderror"
-                                    placeholder="Prioridad..." required>
+                                class="form-control form-control-sm @error('prioridad') is-invalid @enderror"
+                                placeholder="Prioridad..." required>
                         </div>
 
                         <div class="form-group col-md-4 g-3">
-                            <label for="codigo" class="text-sm" >
+                            <label for="codigo" class="text-sm">
                                 {{ __('CÓDIGO') }}
                             </label>
                             <span class="text-danger">(*)</span>
@@ -202,13 +208,14 @@
                         </div>
 
 
-                    </div>  
-                                                            
+                    </div>
+
                     <div class="form-group col-md-12 g-3">
-                        <label for="descripcion" class="text-sm" >
+                        <label for="descripcion" class="text-sm">
                             {{ __('OBSERVACIÓN') }}
                         </label>
-                        <textarea name="descripcion" id="descripcion" class="form-control form-control-sm @error('descripcion') is-invalid @enderror"
+                        <textarea name="descripcion" id="descripcion"
+                            class="form-control form-control-sm @error('descripcion') is-invalid @enderror"
                             placeholder="De ser el caso, ingrese una descripción o comentario...">{{ old('descripcion') }}</textarea>
                         @error('descripcion')
                             <div class="invalid-feedback">
@@ -216,74 +223,71 @@
                             </div>
                         @enderror
                     </div>
-                                                
-                        <div class="text-right mt-3">
 
-                            <button class="btn btn-sm btn-secondary" type="submit" id="saveOrder">Guardar</button>
-                        </div>
+                    <div class="text-right mt-3">
+
+                        <button class="btn btn-sm btn-secondary" type="submit" id="saveOrder">Guardar</button>
                     </div>
-                </form>
             </div>
+            </form>
         </div>
     </div>
+</div>
 </div>
 
 
 @section('js')
-    <script src="{{asset('js/interactive.js')}}"></script>
+    <script src="{{ asset('js/interactive.js') }}"></script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
     <script>
         @if (session('status'))
-        Swal.fire('Éxito', '{{ session('status') }}', 'success');
-
-        
+            Swal.fire('Éxito', '{{ session('status') }}', 'success');
         @elseif (session('error'))
-        Swal.fire('Error', '{{ session('error') }}', 'error');
+            Swal.fire('Error', '{{ session('error') }}', 'error');
         @endif
     </script>
 
 
     <script>
-
         //llenar campos basado en el producto encontrado
-                $(document).on("change", ".cart-product", function() {
-                    var product = $(this).val();
-                    var url = "{{ route('get.product-image.by.product', ['product' => ':product']) }}";
-                    url = url.replace(':product', product);
-                    var currentRow = $(this).closest('tr');
+        $(document).on("change", ".cart-product", function() {
+            var product = $(this).val();
+            var url = "{{ route('get.product-image.by.product', ['product' => ':product']) }}";
+            url = url.replace(':product', product);
+            var currentRow = $(this).closest('tr');
 
-                    $.ajax({
-                        url: url,
-                        type: 'GET',
-                        dataType: 'json',
-                        success: function(response) {
-                            if (response.success) {
-                                var product = response.product;
-                                productImage = currentRow.find('.product-image');
-                                productUnidad = currentRow.find('.product-unidad');
-                                productImage.attr('src', product.image);
-                                productUnidad.val(product.unidad.nombre);
+            $.ajax({
+                url: url,
+                type: 'GET',
+                dataType: 'json',
+                success: function(response) {
+                    if (response.success) {
+                        var product = response.product;
+                        productImage = currentRow.find('.product-image');
+                        productUnidad = currentRow.find('.product-unidad');
+                        productImage.attr('src', product.image);
+                        productUnidad.val(product.unidad.nombre);
 
 
-                            } else {
-                                // Handle error: product not found
-                            }
-                        },
-                        error: function(xhr, status, error) {
-                            // Handle AJAX errors
-                        }
-                    });
-                });
-
+                    } else {
+                        // Handle error: product not found
+                    }
+                },
+                error: function(xhr, status, error) {
+                    // Handle AJAX errors
+                }
+            });
+        });
     </script>
 
 
     <script>
         $(document).ready(function() {
-                    $('.buscador').select2({theme: "classic"});
-                });
-
+            $('.buscador').select2({
+                theme: "classic"
+            });
+        });
     </script>
 
 
@@ -323,17 +327,17 @@
                 });
             }
 
-         
-           
 
-            
+
+
+
 
             $('#buscar_solicitante_btn').click(function() {
                 buscarDocumento('{{ route('buscar.documento') }}', '#documento_solicitante',
                     '#nombre_solicitante');
             });
 
-           
+
 
             // Input validation
             $('.documento-input').on('input', function() {
@@ -351,4 +355,3 @@
         });
     </script>
 @stop
-

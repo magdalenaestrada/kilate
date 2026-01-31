@@ -23,9 +23,6 @@
                 <div class="card-body">
                     <form method="POST" action="{{ route('inventarioprestamosalida.store') }}">
                         @csrf
-
-
-
                         <div class="table-responsive">
                             <table class="table table-bordered">
                                 <thead>
@@ -276,10 +273,10 @@
                 });
             }
 
-            
-          
 
-            
+
+
+
             $('#buscar_responsable_btn').click(function() {
                 buscarDocumento('{{ route('buscar.documento') }}', '#documento_responsable',
                     '#nombre_responsable');

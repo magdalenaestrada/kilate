@@ -290,8 +290,6 @@
                             'success');
                         form.reset();
                         editandoId = null;
-
-                        // ✅ CORRECCIÓN 2: Usar Bootstrap nativo
                         modal.hide();
 
                         cargarTabla();
@@ -301,8 +299,14 @@
 
                 } catch (e) {
                     console.error('Error completo:', e);
-                    Swal.fire('Error', 'No se pudo guardar: ' + e.message, 'error');
+
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Datos incompletos',
+                        text: e.message || 'Complete todos los campos obligatorios'
+                    });
                 }
+
             });
 
             document.addEventListener("click", async e => {
@@ -405,6 +409,46 @@
 
                     select.hide();
                 });
+            });
+
+            document.addEventListener('click', function(e) {
+                if (e.target.id === 'btn-exportar' || e.target.closest('#btn-exportar')) {
+                    e.preventDefault();
+
+                    const btn = e.target.id === 'btn-exportar' ? e.target : e.target.closest(
+                        '#btn-exportar');
+                    const btnTexto = btn.innerHTML;
+                    btn.disabled = true;
+                    btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Exportando...';
+
+                    const formData = new FormData(filtrosForm);
+                    const tempForm = document.createElement('form');
+                    tempForm.method = 'POST';
+                    tempForm.action = '{{ route('otrasBalanza.export') }}';
+
+                    const csrfInput = document.createElement('input');
+                    csrfInput.type = 'hidden';
+                    csrfInput.name = '_token';
+                    csrfInput.value = '{{ csrf_token() }}';
+                    tempForm.appendChild(csrfInput);
+
+                    for (let [key, value] of formData.entries()) {
+                        const input = document.createElement('input');
+                        input.type = 'hidden';
+                        input.name = key;
+                        input.value = value;
+                        tempForm.appendChild(input);
+                    }
+
+                    document.body.appendChild(tempForm);
+                    tempForm.submit();
+
+                    setTimeout(() => {
+                        document.body.removeChild(tempForm);
+                        btn.disabled = false;
+                        btn.innerHTML = btnTexto;
+                    }, 2000);
+                }
             });
 
             cargarTabla();

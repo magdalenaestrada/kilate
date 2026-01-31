@@ -22,6 +22,7 @@ use App\Http\Controllers\PrintController;
 use App\Http\Controllers\AbonadoController;
 use App\Http\Controllers\AreaController;
 use App\Http\Controllers\ChatController;
+use App\Http\Controllers\CircuitoController;
 use App\Http\Controllers\InventarioingresoController;
 use App\Http\Controllers\InventariosalidaController;
 use App\Http\Controllers\ProductosFamiliaController;
@@ -122,6 +123,8 @@ Route::group(['middleware' => ['auth']], function () {
     Route::resource('tscuentasreportesdiarios', TsReporteDiarioCuentasController::class);
     Route::resource('lqliquidaciones', LqLiquidacionController::class);
     Route::resource('lqdevoluciones', LqDevolucionController::class);
+    Route::resource('circuitos', CircuitoController::class)->except(['show', 'create']);
+
 
     Route::get('tscuentasreportesdiarios/{id}/filter', [TsReporteDiarioCuentasController::class, 'filter'])->name('tscuentasreportesdiarios.filter');
 
@@ -190,7 +193,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('export-excel-reportescuentas', [TsReporteDiarioCuentasController::class, 'export_excel'])->name('tsreportescuentas.export-excel');
     Route::get('export-contable-excel-reportescuentas', [TsReporteDiarioCuentasController::class, 'export_excel_contable'])->name('tsreporteContablecuentas.export-excel');
 
-    Route::post('abonados/{abonado}/quitar-ranchos',[AbonadoController::class, 'quitarRanchos'])->name('abonados.quitarRanchos');
+    Route::post('abonados/{abonado}/quitar-ranchos', [AbonadoController::class, 'quitarRanchos'])->name('abonados.quitarRanchos');
 
     //ANULAR ROUTES
     Route::get('/inventarioingresos/{id}/anular', [InventarioingresoController::class, 'anular'])->name('inventarioingresos.anular');
@@ -301,6 +304,7 @@ Route::group(['middleware' => ['auth']], function () {
     //lotes
     Route::post('/lotes', [LoteController::class, 'store'])->name('lotes.store');
     Route::get('/lotes', [LoteController::class, 'index'])->name('lotes');
+    Route::get('findLote', [LoteController::class, 'findLote'])->name('findLote');
     Route::put('/lotes/{id}', [LoteController::class, 'update'])->name('lotes.update');
     Route::delete('/lotes/destroy', [LoteController::class, 'destroy'])->name('lotes.destroy');
     Route::get('/lotes/buscar', [LoteController::class, 'buscar'])->name('lotes.buscar');
@@ -347,6 +351,8 @@ Route::group(['middleware' => ['auth']], function () {
     Route::put('/pesos-update/{id}', [PesoController::class, 'update'])->name('pesos.update');
     Route::post('/pesos/mass-update', [PesoController::class, 'massUpdate'])
         ->name('pesos.massUpdate');
+    Route::post('/pesos/export', [PesoController::class, 'export'])->name('pesos.export');
+
 
 
     Route::prefix('programaciones')->group(function () {
@@ -358,7 +364,7 @@ Route::group(['middleware' => ['auth']], function () {
         Route::get('/{id}/pesos', [PlProgramacionController::class, 'datatable']);
     });
 
-
+    Route::post('/otras-balanza/export', [PesoOtraBalController::class, 'export'])->name('otrasBalanza.export');
     Route::get('/otras-balanza', [PesoOtraBalController::class, 'index'])->name('otrasBalanza.index');
     Route::post('/pesos-otras-balanza', [PesoOtraBalController::class, 'pesos'])->name('otrasBalanza');
     Route::post('/otras-balanza/guardar', [PesoOtraBalController::class, 'guardar'])->name('otrasBalanza.guardar');

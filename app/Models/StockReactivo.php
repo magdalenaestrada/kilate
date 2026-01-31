@@ -11,7 +11,7 @@ class StockReactivo extends Model
     protected $fillable = [
         "fecha_hora",
         "usuario_id",
-        "circuito",
+        "circuito_id",
         "reactivo_id",
         "stock"
     ];
@@ -23,5 +23,9 @@ class StockReactivo extends Model
     public function reactivo()
     {
         return $this->belongsTo(Reactivo::class, "reactivo_id");
+    }
+    public function circuito()
+    {
+        return $this->belongsTo(Circuito::class, 'circuito_id');
     }
 }

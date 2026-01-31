@@ -1,7 +1,19 @@
-<div class="col-md-2 d-flex align-items-center gap-2">
-    <span class="badge bg-success fs-5 p-2">
-        <strong>Total Neto:</strong> {{ number_format($sumaNetos, 2) }}
-    </span>
+<div class="alert alert-warning border-warning mb-4" style="background-color: #fff3cd; border: 3px solid #ffc107;">
+    <div class="d-flex justify-content-center align-items-center">
+        <h2 class="mb-0 fw-bold text-dark">
+            <i class="bi bi-calculator-fill me-2"></i>
+            TOTAL NETO: {{ number_format($sumaNetos, 2) }} KG
+        </h2>
+    </div>
+</div>
+
+
+<div class="d-flex justify-content-end mb-3 gap-2">
+    <div class="col-md-auto">
+        <button type="button" class="btn btn-success" id="btn-exportar">
+            <i class="bi bi-file-earmark-excel"></i> Exportar Excel
+        </button>
+    </div>
 </div>
 
 

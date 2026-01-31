@@ -116,10 +116,10 @@ class ProcesoController extends Controller
         $reactivos = Reactivo::all();
         $consumidos_ids = $proceso->consumosreactivos->pluck('reactivo_id');
 
-        $stock_reactivos = StockReactivo::where("circuito", $proceso->circuito)
+        $stock_reactivos = StockReactivo::where("circuito_id", $proceso->circuito_id)
             ->whereNotIn("reactivo_id", $consumidos_ids)
             ->get();
-        $todos_reactivos = StockReactivo::where("circuito", $proceso->circuito)->get();
+        $todos_reactivos = StockReactivo::where("circuito_id", $proceso->circuito_id)->get();
 
         if ($proceso->pesosotrabal && $proceso->pesosotrabal->count() > 0) {
             $proceso->peso_total = $proceso->pesos->pluck('Neto')->sum() + $proceso->pesosotrabal->pluck('Neto')->sum();
@@ -160,7 +160,7 @@ class ProcesoController extends Controller
     public function stock_disponible($reactivo_id, $circuito)
     {
         $stock = StockReactivo::where('id', $reactivo_id)
-            ->where('circuito', $circuito)
+            ->where('circuito_id', $circuito)
             ->sum('stock');
 
         return response()->json(['stock' => $stock]);
@@ -180,7 +180,7 @@ class ProcesoController extends Controller
         $proceso = Proceso::find($request->proceso_id);
         $stock_reactivo = StockReactivo::findOrFail($request->reactivo_id);
         $stock = StockReactivo::where('id', $request->reactivo_id)
-            ->where('circuito', $proceso->circuito)
+            ->where('circuito_id', $proceso->circuito_id)
             ->sum('stock');
 
         if ($request->cantidad > $stock) {
@@ -208,7 +208,7 @@ class ProcesoController extends Controller
         ]);
 
         StockReactivo::where('id', $request->reactivo_id)
-            ->where('circuito', $proceso->circuito)
+            ->where('circuito_id', $proceso->circuito_id)
             ->decrement('stock', $request->cantidad);
 
         return response()->json(['success' => true]);
@@ -225,7 +225,7 @@ class ProcesoController extends Controller
         $proceso = Proceso::findOrFail($consumo->proceso_id);
 
         $stock = StockReactivo::where('reactivo_id', $consumo->reactivo_id)
-            ->where('circuito', $proceso->circuito);
+            ->where('circuito_id', $proceso->circuito_id);
 
         $stock_actual = $stock->sum('stock');
         $consumo_anterior = $consumo->cantidad;

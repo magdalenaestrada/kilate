@@ -1,7 +1,7 @@
 @extends('admin.layout')
 
 @section('content')
-<br>
+    <br>
     <div class="container">
         <div class="card">
             <div class="card-header">
@@ -21,14 +21,7 @@
             <div class="card-body">
                 <form class="crear-rancho" action="{{ route('ranchos.store') }}" method="POST">
                     @csrf
-
-
                     <div class="row">
-
-
-
-
-                        
                         <div class="form-group col-md-12 g-3">
                             <label for="datos_cliente" class="text-muted">
                                 {{ __('NOMBRE CLIENTE') }}
@@ -48,7 +41,7 @@
 
 
 
-                        
+
 
                         <div class="form-group col-md-4 g-3">
                             <label for="documento_trabajador" class="text-success">
@@ -81,8 +74,7 @@
 
                                 <input type="text" name="datos_trabajador" id="datos_trabajador"
                                     class="form-control @error('datos_trabajador') is-invalid @enderror"
-                                    value="{{ old('datos_trabajador') }}"
-                                    placeholder="Datos obtenidos automáticamente...">
+                                    value="{{ old('datos_trabajador') }}" placeholder="Datos obtenidos automáticamente...">
                             </div>
                             @error('datos_trabajador')
                                 <div class="invalid-feedback">
@@ -100,8 +92,7 @@
                             <div class="input-field">
 
                                 <input type="text" name="lote" id="lote"
-                                    class="form-control @error('lote') is-invalid @enderror"
-                                    value="{{ old('lote') }}"
+                                    class="form-control @error('lote') is-invalid @enderror" value="{{ old('lote') }}"
                                     placeholder="Ingresar lote...">
                             </div>
                             @error('lote')
@@ -111,17 +102,17 @@
                             @enderror
                         </div>
 
-                        
 
-                        
+
+
 
                         <div class="form-group col-md-3 g-3">
                             <label for="cantidad" class="text-muted">
                                 {{ __('CANTIDAD') }}
                             </label>
                             <input type="number" name="cantidad" id="cantidad"
-                                class="form-control @error('cantidad') is-invalid @enderror"
-                                value="{{ old('cantidad') }}" placeholder="0" min="0">
+                                class="form-control @error('cantidad') is-invalid @enderror" value="{{ old('cantidad') }}"
+                                placeholder="0" min="0">
                             @error('cantidad')
                                 <div class="invalid-feedback">
                                     {{ $message }}
@@ -131,13 +122,13 @@
 
 
                         <div class="form-group col-md-6 g-3">
-                            <label for="comida" >
+                            <label for="comida">
                                 {{ __('COMIDA') }}
                             </label>
                             <br>
                             <select name="comida_id" id="comida"
-                                class="form-control  buscador @error('sociedad') is-invalid @enderror"
-                                aria-label="" style="width: 100%" required>
+                                class="form-control  buscador @error('sociedad') is-invalid @enderror" aria-label=""
+                                style="width: 100%" required>
                                 <option selected value="">
                                     SELECCIONE LA COMIDA
                                 </option>
@@ -155,8 +146,8 @@
                             @enderror
                         </div>
 
-                      
-                      
+
+
 
 
 
@@ -227,7 +218,8 @@
                             onAutocomplete: function(reqdata) {
 
                                 $('#documento_socio').val(dataCust2[reqdata][
-                                    'documento_persona']);
+                                    'documento_persona'
+                                ]);
                             }
                         })
                     }
@@ -280,6 +272,28 @@
                         this.submit();
                     }
                 })
+            });
+        </script>
+
+        <script>
+            $('#lote').autocomplete({
+                minLength: 1,
+                source: function(request, response) {
+                    $.ajax({
+                        url: "{{ route('findLote') }}",
+                        data: {
+                            term: request.term
+                        },
+                        success: function(data) {
+                            response($.map(data, function(item) {
+                                return {
+                                    label: item.nombre,
+                                    value: item.nombre
+                                };
+                            }));
+                        }
+                    });
+                }
             });
         </script>
     @endpush

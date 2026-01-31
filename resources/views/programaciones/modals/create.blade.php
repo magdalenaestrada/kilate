@@ -16,7 +16,6 @@
                               <div class="combo">
                                   <input type="text" id="lote_id_input" class="form-control"
                                       placeholder="Escriba o seleccione..." autocomplete="off">
-
                                   <select id="lote_id" class="form-control" size="5" style="display:none;">
                                       @foreach ($lotes as $lote)
                                           <option value="{{ $lote->id }}">{{ $lote->nombre }}</option>
@@ -39,11 +38,18 @@
 
                       <div class="row">
                           <div class="col-md-4">
-                              <label class="form-label fw-semibold">Circuito</label>
-                              <select id="circuito" class="form-control">
-                                  <option value="">Seleccione</option>
-                                  <option value="A">A</option>
-                                  <option value="B">B</option>
+                              <label for="circuito">CIRCUITO</label>
+                              <select class="form-control" name="circuito" id="circuito">
+                                  @if ($circuitos->isEmpty())
+                                      <option value="" selected disabled>No hay circuitos disponibles</option>
+                                  @else
+                                      <option value="" selected disabled>Seleccione</option>
+                                      @foreach ($circuitos as $circuito)
+                                          <option value="{{ $circuito->id }}">
+                                              {{ $circuito->descripcion }}
+                                          </option>
+                                      @endforeach
+                                  @endif
                               </select>
                           </div>
                           <div class="col-md-4 offset-md-4 text-end">
@@ -51,7 +57,7 @@
                               <input type="number" step="0.01" id="peso_total" class="form-control" readonly>
                           </div>
                       </div>
-
+                      <br>
                       <div class="table-responsive bg-white rounded-3 shadow-sm p-3">
                           <table class="table table-sm align-middle text-center" id="tablaPesos">
                               <thead class="table-light">

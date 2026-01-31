@@ -97,7 +97,7 @@
         <tbody>
             <tr>
                 <td>Proceso: {{ $liquidacion->proceso->codigo }}</td>
-                <td>Liquidación: AF-{{ $liquidacion->id }}</td>
+                <td>Liquidación: KC-{{ $liquidacion->id }}</td>
             </tr>
         </tbody>
     </table>
@@ -109,21 +109,20 @@
             {{-- Fila logo + título --}}
             <tr>
                 <td rowspan="2" colspan="2" style="text-align: center;">
-                    <img src="{{ asset('images/terra_mining.jpg') }}" class="logo">
+                    <img src="{{ asset('images/kilate.png') }}" class="logo">
                 </td>
 
                 <td colspan="4" class="text-center font-semibold">
                     LIQUIDACIÓN DE PLANTA DE BENEFICIO <br>
-                    MINERA ALFA GOLDEN S.A.C.
+                    KILATE CORPORATION.
                 </td>
 
                 <td class="font-semibold">RUC</td>
-                <td colspan="2">20606034629</td>
+                <td colspan="2">20605932054</td>
             </tr>
 
-            {{-- Dirección + fecha --}}
             <tr>
-                <td colspan="4">Carretera Pampa de Chauchilla km 1 Fundo Santa Cirila Ica Nasca</td>
+                <td colspan="4">Carretera Poroma s/n, Fundo Don Alfredo, Panamericana Sur km 468, Vista Alegre</td>
                 <td class="font-semibold">FECHA LIQUIDACIÓN</td>
                 <td colspan="2">{{ $liquidacion->fecha->format('d/m/Y') }}</td>
             </tr>
@@ -158,7 +157,7 @@
             {{-- Fin proceso --}}
             <tr>
                 <td class="font-semibold">CIRCUITO</td>
-                <td colspan="3" class="text-center">{{ $liquidacion->proceso->circuito }}</td>
+                <td colspan="3" class="text-center">{{ $liquidacion->proceso->circuito->descripcion }}</td>
 
                 <td class="font-semibold">FIN DEL PROCESO</td>
                 <td colspan="4">
@@ -358,7 +357,7 @@
     <div style="display: flex; width: 100%; gap: 20px;">
 
         <div style="width: 50%; font-size: 9px;">
-            La empresa MINERA ALFA GOLDEN S.A.C cubre los gastos de:
+            La empresa KILATE CORPORATION S.A.C cubre los gastos de:
             <br>
             20 gr/ton de D250 DOWFROTH
             <br>
@@ -368,7 +367,7 @@
 
             </p>
 
-            <p><strong>Facilitador: {{ $liquidacion->user->name ?? "" }}</strong></p>
+            <p><strong>Facilitador: {{ $liquidacion->user->name ?? '' }}</strong></p>
         </div>
 
         <div style="width: 50%;">

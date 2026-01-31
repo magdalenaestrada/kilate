@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Circuito;
 use Illuminate\Http\Request;
 use App\Models\Lote;
 use App\Models\LqCliente;
@@ -22,8 +23,11 @@ class PlProgramacionController extends Controller
     }
     public function index()
     {
-        $lotes = Lote::with('pesos', 'pesos.estado', 'pesos.proceso')->get();
+        $lotes = Lote::with('pesos', 'pesos.estado', 'pesos.proceso')
+            ->where('codigo', 'not like', 'COM%')
+            ->get();
         $clientes = LqCliente::all();
+        $circuitos = Circuito::all();
         $programaciones = PlProgramacion::with('proceso.pesos', 'proceso.lote')
             ->whereHas('proceso', function ($q) {
                 $q->where('molienda', false);
@@ -34,13 +38,13 @@ class PlProgramacionController extends Controller
                     'fecha_fin' => $p->fecha_fin,
                     'lote_id' => $p->proceso->lote->id ?? null,
                     'lote_nombre' => $p->proceso->lote->nombre ?? 'N/A',
-                    'circuito' => $p->proceso->circuito ?? 'N/A',
+                    'circuito_id' => $p->proceso->circuito_id ?? 'N/A',
                     'estado' => $p->proceso->estado ?? 'P', // o el campo que corresponda
                     'pesos' => $p->proceso->pesos->pluck('NroSalida')->toArray()
                 ];
             });
 
-        return view('programaciones.index', compact('lotes', 'programaciones', 'clientes'));
+        return view('programaciones.index', compact('lotes', 'programaciones', 'clientes', 'circuitos'));
     }
 
     public function store(Request $request)
@@ -67,7 +71,7 @@ class PlProgramacionController extends Controller
                 'fecha_inicio' => Carbon::parse($request->fecha_inicio),
                 'fecha_fin' => Carbon::parse($request->fecha_fin),
                 'peso_total' => $request->peso_total,
-                'circuito' => $request->circuito,
+                'circuito_id' => $request->circuito,
 
             ]);
 
@@ -211,7 +215,7 @@ class PlProgramacionController extends Controller
                 'fecha_inicio' => $request->fecha_inicio,
                 'fecha_fin' => $request->fecha_fin,
                 'peso_total' => $request->peso_total,
-                'circuito' => $request->circuito,
+                'circuito_id' => $request->circuito,
             ]);
 
             $pesosOtras = $request->input('pesos_otras', []);

@@ -9,7 +9,7 @@
     <meta name="mobile-web-app-capable" content="yes">
 
 
-    <title>TERRA MINING</title>
+    <title>KILATE CORPORATION</title>
 
 
     <!-- Fonts -->
@@ -62,7 +62,7 @@
             </script>
         </ul>
         <div style="margin-top: 27px" id="flipdown" class="flipdown"></div>
-        <h1>Terra Mining S.R.L</h1>
+        <h1>Kilate Corporation S.A.C</h1>
 
       
 

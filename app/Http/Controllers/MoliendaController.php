@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Circuito;
 use App\Models\FechaMoliendaProceso;
 use App\Models\Molienda;
 use Illuminate\Http\Request;
@@ -34,7 +35,8 @@ class MoliendaController extends Controller
         $lotes = Lote::with('pesos', 'pesos.estado', 'pesos.proceso')->get();
         $clientes = LqCliente::all();
         $tiempos = FechaMoliendaProceso::all();
-        return view('programaciones.molienda.index', compact('procesos', 'lotes', 'clientes', 'tiempos'));
+        $circuitos = Circuito::all();
+        return view('programaciones.molienda.index', compact('procesos', 'lotes', 'clientes', 'tiempos', 'circuitos'));
     }
 
     public function store(Request $request)
@@ -54,7 +56,7 @@ class MoliendaController extends Controller
                 'codigo' => $this->GenerarCodigoProceso($request),
                 'lote_id' => $request->lote_id,
                 'peso_total' => $request->peso_total,
-                'circuito' => $request->circuito,
+                'circuito_id' => $request->circuito,
                 'molienda' => 1,
 
             ]);
@@ -144,7 +146,7 @@ class MoliendaController extends Controller
             'proceso' => [
                 'id' => $proceso->id,
                 'lote_id' => $proceso->lote_id,
-                'circuito' => $proceso->circuito,
+                'circuito_id' => $proceso->circuito_id,
             ],
             'pesos' => $pesosTotales,
         ]);
@@ -309,7 +311,7 @@ class MoliendaController extends Controller
             $proceso->update([
                 'lote_id' => $request->lote_id,
                 'peso_total' => $request->peso_total,
-                'circuito' => $request->circuito,
+                'circuito_id' => $request->circuito,
             ]);
 
             foreach ($request->pesos as $nro) {

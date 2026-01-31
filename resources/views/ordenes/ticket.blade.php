@@ -201,17 +201,17 @@
 <body>
     <!-- Marca de agua -->
     <div class="watermark">
-        <img src="{{ asset('images/terra_mining.jpg') }}" alt="Marca de agua">
+        <img src="{{ asset('images/kilate.png') }}" alt="Marca de agua">
     </div>
 
     <div class="doc">
         <!-- Header -->
         <div class="doc-header">
             <div class="brand">
-                <img src="{{ asset('images/terra_mining.jpg') }}" alt="Logo">
+                <img src="{{ asset('images/kilate.png') }}" alt="Logo">
                 <div>
-                    <div style="font-weight:700">TERRA MINING S.R.L</div>
-                    <div class="muted" style="font-size:11px">RUC 20606498781</div>
+                    <div style="font-weight:700">KILATE CORPORATION S.A.C</div>
+                    <div class="muted" style="font-size:11px">RUC 20605932054</div>
                 </div>
             </div>
             <div class="text-end">
@@ -231,11 +231,11 @@
                 <h4>Datos del Cliente</h4>
                 <div class="kv">
                     <div class="label">Razón Social</div>
-                    <div class="value">TERRA MINING S.R.L</div>
+                    <div class="value">KILATE CORPORATION S.A.C</div>
                 </div>
                 <div class="kv">
                     <div class="label">RUC</div>
-                    <div class="value">20606498781</div>
+                    <div class="value">20605932054</div>
                 </div>
                 @php
                     $estados = [

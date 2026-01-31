@@ -27,92 +27,57 @@
                         </div>
                     </div>
                     <div class="row">
-                        <div class="card-body table-responsive col-md-6">
+                        @forelse ($stockPorCircuito as $circuito => $stocks)
+                            <div class="card-body table-responsive col-md-6">
 
-                            <div class="d-flex justify-content-between align-items-center mb-3">
-                                <h5 class="text-center mb-0"><strong>CIRCUITO A</strong></h5>
-                                <button class="btn btn-primary btn-sm" onclick="resetCircuito('A')">
-                                    DEVOLVER REACTIVOS
-                                </button>
-                                <form id="form-reset-A" action="{{ route('reactivos.reset', 'A') }}" method="POST"
-                                    style="display: none;">
-                                    @csrf
-                                </form>
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <h5 class="mb-0">
+                                        <strong>CIRCUITO {{ $circuito }}</strong>
+                                    </h5>
+
+                                    <button class="btn btn-primary btn-sm" onclick="resetCircuito('{{ $circuito }}')">
+                                        DEVOLVER REACTIVOS
+                                    </button>
+
+                                    <form id="form-reset-{{ $circuito }}"
+                                        action="{{ route('reactivos.reset', $circuito) }}" method="POST"
+                                        style="display: none;">
+                                        @csrf
+                                    </form>
+                                </div>
+
+                                <table class="table table-striped table-hover text-center mb-5">
+                                    <thead>
+                                        <tr>
+                                            <th>NOMBRE</th>
+                                            <th>CIRCUITO</th>
+                                            <th>STOCK</th>
+                                        </tr>
+                                    </thead>
+
+                                    <tbody style="font-size:13px">
+                                        @forelse ($stocks as $stock_reactivo)
+                                            <tr>
+                                                <td>{{ $stock_reactivo->reactivo->producto->nombre_producto }}</td>
+                                                <td>{{ $stock_reactivo->circuito->descripcion }}</td>
+                                                <td>{{ $stock_reactivo->stock }}</td>
+                                            </tr>
+                                        @empty
+                                            <tr>
+                                                <td colspan="3" class="text-center text-muted">
+                                                    No hay reactivos registrados para este circuito
+                                                </td>
+                                            </tr>
+                                        @endforelse
+                                    </tbody>
+                                </table>
+
                             </div>
-
-                            <table class="table table-striped table-hover text-center mb-5">
-                                <thead>
-                                    <tr>
-                                        <th>NOMBRE</th>
-                                        <th>CIRCUITO</th>
-                                        <th>STOCK</th>
-                                    </tr>
-                                </thead>
-                                <tbody style="font-size:13px">
-                                    @php
-                                        $a = $stock_reactivos->where('circuito', 'A');
-                                    @endphp
-
-                                    @forelse ($a as $stock_reactivo)
-                                        <tr>
-                                            <td>{{ $stock_reactivo->reactivo->producto->nombre_producto }}</td>
-                                            <td>{{ $stock_reactivo->circuito }}</td>
-                                            <td>{{ $stock_reactivo->stock }}</td>
-                                        </tr>
-                                    @empty
-                                        <tr>
-                                            <td colspan="3" class="text-center text-muted">
-                                                No hay reactivos registrados para el CIRCUITO A
-                                            </td>
-                                        </tr>
-                                    @endforelse
-                                </tbody>
-                            </table>
-                        </div>
-
-                        <div class="card-body table-responsive col-md-6">
-
-                            <div class="d-flex justify-content-between align-items-center mb-3">
-                                <h5 class="text-center mb-0"><strong>CIRCUITO B</strong></h5>
-                                <button class="btn btn-primary btn-sm" onclick="resetCircuito('B')">
-                                    DEVOLVER REACTIVOS
-                                </button>
-                                <form id="form-reset-B" action="{{ route('reactivos.reset', 'B') }}" method="POST"
-                                    style="display: none;">
-                                    @csrf
-                                </form>
+                        @empty
+                            <div class="col-12 text-center text-muted">
+                                No hay circuitos disponibles
                             </div>
-
-                            <table class="table table-striped table-hover text-center">
-                                <thead>
-                                    <tr>
-                                        <th>NOMBRE</th>
-                                        <th>CIRCUITO</th>
-                                        <th>STOCK</th>
-                                    </tr>
-                                </thead>
-                                <tbody style="font-size:13px">
-                                    @php
-                                        $b = $stock_reactivos->where('circuito', 'B');
-                                    @endphp
-
-                                    @forelse ($b as $stock_reactivo)
-                                        <tr>
-                                            <td>{{ $stock_reactivo->reactivo->producto->nombre_producto }}</td>
-                                            <td>{{ $stock_reactivo->circuito }}</td>
-                                            <td>{{ $stock_reactivo->stock }}</td>
-                                        </tr>
-                                    @empty
-                                        <tr>
-                                            <td colspan="3" class="text-center text-muted">
-                                                No hay reactivos registrados para el CIRCUITO B
-                                            </td>
-                                        </tr>
-                                    @endforelse
-                                </tbody>
-                            </table>
-
-                        </div>
+                        @endforelse
                     </div>
 
                 </div>

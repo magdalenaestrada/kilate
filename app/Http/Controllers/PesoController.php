@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\PesosExport;
 use Illuminate\Http\Request;
 use App\Models\Peso;
 use App\Models\Lote;
 use App\Models\PsEstado;
 use App\Models\PsEstadoPeso;
 use App\Models\PsLotePeso;
+use Maatwebsite\Excel\Facades\Excel;
 
 class PesoController extends Controller
 {
@@ -21,8 +23,9 @@ class PesoController extends Controller
     public function index()
     {
         $estados = PsEstado::all();
-        $lotes = Lote::all();
-
+        $lotes = Lote::whereRaw('UPPER(codigo) NOT LIKE ?', ['COM%'])
+            ->orderBy('nombre')
+            ->get();
         return view('pesos.index', compact('estados', 'lotes'));
     }
 
@@ -96,7 +99,9 @@ class PesoController extends Controller
         $pesos = $query->orderBy('Fechai', 'desc')->paginate(100);
 
         $estados = PsEstado::all();
-        $lotes = Lote::all();
+        $lotes = Lote::whereRaw('UPPER(codigo) NOT LIKE ?', ['COM%'])
+            ->orderBy('nombre')
+            ->get();
 
         if ($request->ajax()) {
             return view('pesos.partials.tabla', compact('pesos', 'estados', 'lotes', 'sumaNetos'))->render();
@@ -164,5 +169,71 @@ class PesoController extends Controller
             'success' => true,
             'message' => 'Registros actualizados correctamente'
         ]);
+    }
+
+    public function export(Request $request)
+    {
+        $query = Peso::query()->with(['estado', 'lote']);
+
+        // MISMOS FILTROS que en el método pesos()
+        if ($request->filled('desde')) {
+            $query->whereDate('Fechai', '>=', $request->desde);
+        }
+
+        if ($request->filled('hasta')) {
+            $query->whereDate('Fechas', '<=', $request->hasta);
+        }
+
+        if ($request->filled('RazonSocial')) {
+            $query->where('RazonSocial', 'like', "%{$request->RazonSocial}%");
+        }
+
+        if ($request->filled('NroSalida')) {
+            $query->where('NroSalida', 'like', "%{$request->NroSalida}%");
+        }
+
+        if ($request->filled('origen')) {
+            $query->where('origen', 'like', "%{$request->origen}%");
+        }
+
+        if ($request->filled('destino')) {
+            $query->where('destino', 'like', "%{$request->destino}%");
+        }
+
+        if ($request->filled('estado_id')) {
+            if ($request->estado_id === 'sin_estado') {
+                $query->whereDoesntHave('estadoPuente');
+            } elseif ($request->estado_id != '') {
+                $query->whereHas('estadoPuente', function ($q) use ($request) {
+                    $q->where('estado_id', $request->estado_id);
+                });
+            }
+        }
+
+        if ($request->filled('Producto')) {
+            $query->where('Producto', 'like', "%{$request->Producto}%");
+        }
+
+        if ($request->filled('Conductor')) {
+            $query->where('Conductor', 'like', "%{$request->Conductor}%");
+        }
+
+        if ($request->filled('Placa')) {
+            $query->where('Placa', 'like', "%{$request->Placa}%");
+        }
+
+        if ($request->filled('Observacion')) {
+            $query->where('Observacion', 'like', "%{$request->Observacion}%");
+        }
+
+        if ($request->filled('lote')) {
+            $query->whereHas('lote', function ($q) use ($request) {
+                $q->where('nombre', 'like', "%{$request->lote}%");
+            });
+        }
+
+        $pesos = $query->get();
+
+        return Excel::download(new PesosExport($pesos), 'pesos_' . date('Y-m-d_His') . '.xlsx');
     }
 }

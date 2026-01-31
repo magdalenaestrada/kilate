@@ -13,7 +13,7 @@
     <br>
     <div class="container">
         <div class="text-end">
-            <img style="width: 90px" src="{{ asset('images/terra_mining.jpg') }}" alt="">
+            <img style="width: 90px" src="{{ asset('images/kilate.png') }}" alt="">
         </div>
 
         <div class="text-center" style="margin-top: -10%">
@@ -28,8 +28,8 @@
         <hr>
         <br>
         <p><strong>Fecha de creación de la salida:</strong> {{ $invsalidarapida->created_at }}</p>
-        <p><strong>Empresa: </strong>TERRA MINING S.R.L</p>
-        <p><strong>Ruc: </strong>20606498781</p>
+        <p><strong>Empresa: </strong>KILATE CORPORATION S.A.C</p>
+        <p><strong>Ruc: </strong>20605932054</p>
 
         <p><strong>Solicitante: </strong>{{ $invsalidarapida->nombre_solicitante }}</p>
         <p><strong>Dni del solicitante: </strong>{{ $invsalidarapida->documento_solicitante }}</p>

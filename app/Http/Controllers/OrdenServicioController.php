@@ -9,6 +9,7 @@ use App\Http\Requests\OrdenServicio\SubmitOrdenServicioRequest;
 use App\Models\Comprobante;
 use App\Models\DetalleOrdenServicio;
 use App\Models\OrdenServicio;
+use App\Models\Producto;
 use App\Models\Proveedor;
 use Carbon\Carbon;
 use Illuminate\Http\Request;

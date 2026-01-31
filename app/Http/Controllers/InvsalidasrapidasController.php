@@ -3,20 +3,19 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-
 use App\Models\Invsalidasrapidas;
 use App\Models\Invsalidasrapidasdetalles;
 use App\Models\Producto;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Carbon\Carbon;
 use App\Exports\DetalleInventarioSalidaRapidaExport;
+use App\Models\Circuito;
 use App\Models\Persona;
 use App\Models\Reactivo;
 use App\Models\StockReactivo;
 use App\Models\User;
 use Excel;
 use Illuminate\Support\Facades\DB;
-
 
 class InvsalidasrapidasController extends Controller
 {
@@ -28,16 +27,13 @@ class InvsalidasrapidasController extends Controller
         $this->middleware('permission:editar producto', ['only' => ['update', 'edit']]);
     }
 
-
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
+        $circuitos = Circuito::all();
         $productos = Producto::all();
         $invsalidasrapidas = Invsalidasrapidas::orderBy('created_at', 'desc')->paginate(100);
         $today =  Carbon::today();
-        return view('invsalidasrapidas.index', compact('invsalidasrapidas', 'productos', 'today'));
+        return view('invsalidasrapidas.index', compact('invsalidasrapidas', 'productos', 'today', 'circuitos'));
     }
 
     /**
@@ -65,7 +61,6 @@ class InvsalidasrapidasController extends Controller
 
             $products_p = $request->input('products');
             $index_p = 0;
-            // Create order items
             foreach ($products_p as $productId) {
                 $producto = Producto::find($productId);
 
@@ -75,12 +70,11 @@ class InvsalidasrapidasController extends Controller
                 $producto->save();
                 $index_p = $index_p + 1;
             }
-            // Create the order
             $invsalidarapida = new Invsalidasrapidas;
             $invsalidarapida->destino = $request->destino;
             $invsalidarapida->documento_solicitante = $request->documento_solicitante;
             $invsalidarapida->nombre_solicitante = $request->nombre_solicitante;
-            $invsalidarapida->circuito = $request->circuito;
+            $invsalidarapida->circuito_id = $request->circuito;
             $invsalidarapida->turno = $request->turno;
             $invsalidarapida->reactivo = $request->reactivo;
             $invsalidarapida->usuario_creador = auth()->user()->name;
@@ -106,7 +100,7 @@ class InvsalidasrapidasController extends Controller
                     $hoy = Carbon::now("America/Lima");
                     $reactivo_id = Reactivo::where('producto_id', $productId)->value('id');
                     $reactivo = StockReactivo::where("reactivo_id", $reactivo_id)
-                        ->where("circuito", $request->circuito)
+                        ->where("circuito_id", $request->circuito)
                         ->first();
 
                     if ($reactivo) {
@@ -118,7 +112,7 @@ class InvsalidasrapidasController extends Controller
                         StockReactivo::create([
                             "fecha_hora"   => $hoy,
                             "usuario_id"   => auth()->id(),
-                            "circuito"     => $request->circuito,
+                            "circuito_id"  => $request->circuito,
                             "reactivo_id"  => $reactivo_id,
                             "stock"        => $cantidad,
                         ]);

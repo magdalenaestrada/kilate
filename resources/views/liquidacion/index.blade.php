@@ -42,7 +42,7 @@
                                     <td class="text-center">{{ $proceso->lote->nombre ?? '' }}</td>
                                     <td class="text-center">{{ $proceso->programacion->fecha_inicio ?? '' }}</td>
                                     <td class="text-center">{{ $proceso->programacion->fecha_fin ?? '' }}</td>
-                                    <td class="text-center">{{ $proceso->circuito }}</td>
+                                    <td class="text-center">{{ $proceso->circuito->descripcion }}</td>
                                     <td class="text-center">{{ intval($proceso->peso_total) }}</td>
                                     <td class="text-center">
                                         <div class="d-flex justify-content-center align-items-center">

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\OtrosPesosExport;
 use App\Http\Controllers\Controller;
 use App\Models\Lote;
 use App\Models\PesoOtraBal;
@@ -9,6 +10,9 @@ use App\Models\PlProgramacion;
 use App\Models\Proceso;
 use App\Models\PsEstado;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
+use Maatwebsite\Excel\Facades\Excel;
 
 class PesoOtraBalController extends Controller
 {
@@ -27,7 +31,9 @@ class PesoOtraBalController extends Controller
     public function index()
     {
         $estados = PsEstado::all();
-        $lotes = Lote::all();
+        $lotes = Lote::whereRaw('UPPER(codigo) NOT LIKE ?', ['COM%'])
+            ->orderBy('nombre')
+            ->get();
         return view('otros-pesos.index', compact('estados', 'lotes'));
     }
 
@@ -87,8 +93,9 @@ class PesoOtraBalController extends Controller
         $pesos = $query->orderBy('id', 'desc')->paginate(100);
 
         $estados = PsEstado::all();
-        $lotes = Lote::all();
-
+        $lotes = Lote::whereRaw('UPPER(codigo) NOT LIKE ?', ['COM%'])
+            ->orderBy('nombre')
+            ->get();
         if ($request->ajax()) {
             return view('otros-pesos.partials.tabla', compact('pesos', 'estados', 'lotes', 'sumaNetos'))->render();
         }
@@ -98,37 +105,67 @@ class PesoOtraBalController extends Controller
 
     public function guardar(Request $request)
     {
+        try {
 
-        $razon_id = Lote::findOrFail("$request->lote_id")->lq_cliente_id;
-        PesoOtraBal::create([
-            'fechai' => str_replace('T', ' ', $request->fechai),
-            'fechas' => $request->fechas
-                ? str_replace('T', ' ', $request->fechas)
-                : null,
-            'lote_id' => $request->lote_id,
-            'bruto' => $request->bruto,
-            'tara' => $request->tara,
-            'neto' => $request->neto,
-            'placa' => $request->placa,
-            'observacion' => $request->observacion,
-            'producto' => $request->producto,
-            'conductor' => $request->conductor,
-            'guia' => $request->guia,
-            'guiat' => $request->guiat,
-            'origen' => $request->origen,
-            'destino' => $request->destino,
-            'balanza' => $request->balanza,
-            'razon_social_id' => $razon_id,
-            'estado_id' => 1,
-            'usuario_id' => Auth()->id(),
+            $request->validate([
+                'lote_id'   => 'required|exists:lotes,id',
+                'fechai'    => 'required',
+                'fechas'    => 'required',
+                'producto'  => 'required',
+                'conductor' => 'required',
+                'placa'     => 'required',
+                'origen'    => 'required',
+                'destino'   => 'required',
+                'balanza'   => 'required',
+                'bruto'     => 'required|numeric',
+                'tara'      => 'required|numeric',
+                'neto'      => 'required|numeric',
+                'guia'      => 'required',
+                'guiat'     => 'required',
+            ]);
 
-        ]);
+            $lote = Lote::findOrFail($request->lote_id);
 
-        return response()->json([
-            'success' => true
-        ]);
+            PesoOtraBal::create([
+                'fechai' => str_replace('T', ' ', $request->fechai),
+                'fechas' => str_replace('T', ' ', $request->fechas),
+                'lote_id' => $request->lote_id,
+                'bruto' => $request->bruto,
+                'tara' => $request->tara,
+                'neto' => $request->neto,
+                'placa' => $request->placa,
+                'observacion' => Str::upper($request->observacion),
+                'producto' => Str::upper($request->producto),
+                'conductor' => Str::upper($request->conductor),
+                'guia' => Str::upper($request->guia),
+                'guiat' => Str::upper($request->guiat),
+                'origen' => Str::upper($request->origen),
+                'destino' => Str::upper($request->destino),
+                'balanza' => Str::upper($request->balanza),
+                'razon_social_id' => $lote->lq_cliente_id,
+                'estado_id' => 1,
+                'usuario_id' => auth()->id(),
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Peso registrado correctamente'
+            ]);
+        } catch (ValidationException $e) {
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Complete todos los campos obligatorios',
+                'errors'  => $e->errors()
+            ], 422);
+        } catch (\Throwable $e) {
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Error interno al guardar el peso'
+            ], 500);
+        }
     }
-
 
     public function store(Request $request, $id)
     {
@@ -144,15 +181,15 @@ class PesoOtraBalController extends Controller
             'tara' => $request->tara,
             'neto' => $request->neto,
             'placa' => $request->placa,
-            'observacion' => $request->observacion,
-            'producto' => $request->producto,
-            'conductor' => $request->conductor,
+            'observacion' => Str::upper($request->observacion),
+            'producto' => Str::upper($request->producto),
+            'conductor' => Str::upper($request->conductor),
             'razon_social_id' => $programacion->proceso->lote->lq_cliente_id,
             'guia' => $request->guia,
             'guiat' => $request->guiat,
-            'origen' => $request->origen,
-            'destino' => $request->destino,
-            'balanza' => $request->balanza,
+            'origen' => Str::upper($request->origen),
+            'destino' => Str::upper($request->destino),
+            'balanza' => Str::upper($request->balanza),
             'lote_id' => $programacion->proceso->lote_id,
             'proceso_id' => $programacion->proceso_id,
             'programacion_id' => $id,
@@ -330,5 +367,71 @@ class PesoOtraBalController extends Controller
                     'placa' => $otra_balanza->placa,
                 ];
             });
+    }
+
+    public function export(Request $request)
+    {
+        $query = PesoOtraBal::query()->with(['estado', 'lote']);
+
+        if ($request->filled('desde')) {
+            $query->whereDate('Fechai', '>=', $request->desde);
+        }
+
+        if ($request->filled('hasta')) {
+            $query->whereDate('Fechas', '<=', $request->hasta);
+        }
+
+        if ($request->filled('RazonSocial')) {
+            $query->where('RazonSocial', 'like', "%{$request->RazonSocial}%");
+        }
+
+        if ($request->filled('NroSalida')) {
+            $query->where('NroSalida', 'like', "%{$request->NroSalida}%");
+        }
+
+        if ($request->filled('origen')) {
+            $query->where('origen', 'like', "%{$request->origen}%");
+        }
+
+        if ($request->filled('destino')) {
+            $query->where('destino', 'like', "%{$request->destino}%");
+        }
+
+        if ($request->filled('estado_id')) {
+
+            if ($request->estado_id === 'sin_estado') {
+
+                $query->whereNull('estado_id');
+            } else {
+
+                $query->where('estado_id', $request->estado_id);
+            }
+        }
+
+        if ($request->filled('Producto')) {
+            $query->where('Producto', 'like', "%{$request->Producto}%");
+        }
+
+        if ($request->filled('Conductor')) {
+            $query->where('Conductor', 'like', "%{$request->Conductor}%");
+        }
+
+        if ($request->filled('Placa')) {
+            $query->where('Placa', 'like', "%{$request->Placa}%");
+        }
+
+        if ($request->filled('Observacion')) {
+            $query->where('Observacion', 'like', "%{$request->Observacion}%");
+        }
+
+        if ($request->filled('lote')) {
+            $query->whereHas('lote', function ($q) use ($request) {
+                $q->where('nombre', 'like', "%{$request->lote}%");
+            });
+        }
+
+        $pesos = $query->get();
+
+        return Excel::download(new OtrosPesosExport($pesos), 'pesos_' . date('Y-m-d_His') . '.xlsx');
     }
 }

@@ -21,10 +21,11 @@ class LoteController extends Controller
         $this->middleware('permission:eliminar lotes')->only(['destroy']);
         $this->middleware('permission:gestionar lotes');
     }
-
     public function index()
     {
-        $lotes = Lote::with('cliente')->orderBy('created_at', "desc")
+        $lotes = Lote::with('cliente')
+            ->where('codigo', 'NOT LIKE', 'COM-%')
+            ->orderBy('created_at', "desc")
             ->paginate(10);
         $clientes = LqCliente::withCount('lotes')->get();
         return view('lotes.index', compact('lotes', 'clientes'));
@@ -147,5 +148,12 @@ class LoteController extends Controller
             ->get();
 
         return response()->json($pesos);
+    }
+    public function findLote(Request $request)
+    {
+        return Lote::where('codigo', 'LIKE', 'COM -%')
+            ->where('nombre', 'LIKE', '%' . $request->term . '%')
+            ->limit(10)
+            ->get(['id', 'nombre']);
     }
 }

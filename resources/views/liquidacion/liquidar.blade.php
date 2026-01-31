@@ -26,7 +26,7 @@
                                 </tr>
                                 <tr>
                                     <td class="border border-gray-200 p-2 font-semibold">Circuito</td>
-                                    <td class="border border-gray-200 p-2">{{ $proceso->circuito }}</td>
+                                    <td class="border border-gray-200 p-2">{{ $proceso->circuito->descripcion }}</td>
                                 </tr>
                                 <tr>
                                     <td class="border border-gray-200 p-2 font-semibold">Fecha</td>

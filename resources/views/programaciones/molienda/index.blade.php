@@ -48,7 +48,7 @@
                                     <td class="text-center">{{ $proceso->id }}</td>
                                     <td class="text-center">{{ $proceso->codigo }}</td>
                                     <td class="text-center">{{ $proceso->lote->nombre ?? '' }}</td>
-                                    <td class="text-center">{{ $proceso->circuito }}</td>
+                                    <td class="text-center">{{ $proceso->circuito->descripcion ?? '' }}</td>
                                     <td class="text-center">{{ intval($proceso->peso_total) }}</td>
                                     <td class="text-center">
                                         <div class="d-flex justify-content-center align-items-center">
@@ -173,7 +173,7 @@
                         $('#lote_id_input').prop('disabled', true);
                         $('#lote_id').hide();
 
-                        $('#circuito').val(proceso.circuito ?? '');
+                        $('#circuito').val(proceso.circuito_id ?? '');
 
                         const tablaPesosBody = $('#tablaPesos tbody');
                         const tablaOtrasBody = $('#tablaOtrasBalanzas tbody');
@@ -847,7 +847,6 @@
                 }
             });
         }
-
 
         function recolorearPorCircuito() {
             calendar.getEvents().forEach(e => {

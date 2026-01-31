@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Proceso extends Model
 {
     protected $table = 'procesos';
-    protected $fillable = ['id', 'lote_id', 'peso_total', 'circuito', 'codigo', 'estado', 'molienda'];
+    protected $fillable = ['id', 'lote_id', 'peso_total', 'circuito_id', 'codigo', 'estado', 'molienda'];
 
 
     public function pesos()
@@ -27,6 +27,10 @@ class Proceso extends Model
         return $this->belongsTo(Lote::class, 'lote_id');
     }
 
+    public function circuito()
+    {
+        return $this->belongsTo(Circuito::class, 'circuito_id');
+    }
     public function programacion()
     {
         return $this->hasOne(PlProgramacion::class, 'proceso_id');

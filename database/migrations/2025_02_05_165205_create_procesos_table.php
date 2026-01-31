@@ -6,9 +6,6 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('procesos', function (Blueprint $table) {
@@ -16,7 +13,7 @@ return new class extends Migration
             $table->decimal('peso_total', 15, 2);
             $table->unsignedBigInteger('lote_id');
             $table->foreign('lote_id')->references('id')->on('lotes')->onDelete('restrict');
-            $table->string('circuito')->nullable();
+            $table->foreignId('circuito_id')->nullable()->constrained('circuitos');
             $table->timestamps();
         });
     }

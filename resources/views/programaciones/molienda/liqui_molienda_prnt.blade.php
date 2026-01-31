@@ -87,21 +87,21 @@
         <tbody>
             <tr>
                 <td rowspan="2" colspan="1" style="text-align: center;">
-                    <img src="{{ asset('images/terra_mining.jpg') }}" class="logo">
+                    <img src="{{ asset('images/kilate.png') }}" class="logo">
                 </td>
 
                 <td colspan="5" class="font-semibold">
                     <b>LIQUIDACIÓN DE MOLIENDA EN PLANTA DE BENEFICIO
-                        MINERA ALFA GOLDEN S.A.C.</b>
+                        KILATE CORPORATION.</b>
                 </td>
 
                 <td class="font-semibold">RUC</td>
-                <td colspan="1">20606034629</td>
+                <td colspan="1">20605932054</td>
             </tr>
 
             {{-- Dirección --}}
             <tr>
-                <td colspan="5">Carretera Pampa de Chauchilla km 1 Fundo Santa Cirila Ica Nasca</td>
+                <td colspan="5">Carretera Poroma s/n, Fundo Don Alfredo, Panamericana Sur km 468, Vista Alegre</td>
                 <td class="font-semibold">FECHA</td>
                 <td colspan="1">{{ date('d/m/Y') }}</td>
             </tr>
@@ -123,11 +123,9 @@
 
             <tr>
                 <td class="font-semibold">CIRCUITO</td>
-                <td colspan="4">{{ $proceso->circuito }}</td>
-
+                <td colspan="4">{{ $proceso->circuito->descripcion }}</td>
                 <td class="font-semibold">ORIGEN DEL MINERAL</td>
                 <td colspan="4"></td>
-
             </tr>
 
         </tbody>

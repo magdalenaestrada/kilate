@@ -155,10 +155,18 @@
                             <div class="form-group col-md-6 g-3 mb-3">
                                 <label for="circuito">CIRCUITO</label>
                                 <select class="form-control" name="circuito" id="circuito">
-                                    <option value="" selected disabled>Seleccione</option>
-                                    <option value="A">A</option>
-                                    <option value="B">B</option>
+                                    @if ($circuitos->isEmpty())
+                                        <option value="" selected disabled>No hay circuitos disponibles</option>
+                                    @else
+                                        <option value="" selected disabled>Seleccione</option>
+                                        @foreach ($circuitos as $circuito)
+                                            <option value="{{ $circuito->id }}">
+                                                {{ $circuito->descripcion }}
+                                            </option>
+                                        @endforeach
+                                    @endif
                                 </select>
+
                             </div>
 
 

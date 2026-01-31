@@ -391,7 +391,7 @@
                         $('#lote_id_input').val(loteTexto);
                         $('#lote_id_real').val(p.proceso.lote.id);
                         $('#lote_id').prop('disabled', true);
-                        $('#circuito').val(p.proceso.circuito).trigger('change');
+                        $('#circuito').val(p.proceso.circuito_id).trigger('change');
                         $('#fecha_inicio').val(moment(p.fecha_inicio).format('YYYY-MM-DDTHH:mm'));
                         $('#fecha_fin').val(moment(p.fecha_fin).format('YYYY-MM-DDTHH:mm'));
                         $('#otra_balanza').show();

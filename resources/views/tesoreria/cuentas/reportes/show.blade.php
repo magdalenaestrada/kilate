@@ -401,7 +401,7 @@
                                 </div>
                                 <div class="card__valid-thru" aria-label="Valid thru">Fecha<br>creac</div>
                                 <div class="card__exp-date">{{ $cuenta->created_at->format('m/Y') }}</div>
-                                <div class="card__name" aria-label="Dee Stroyer">SISTEMA TERRA MINING</div>
+                                <div class="card__name" aria-label="Dee Stroyer">SISTEMA KILATE CORPORATION</div>
                                 <div class="card__vendor" role="img" aria-labelledby="card-vendor">
                                     <span id="card-vendor" class="card__vendor-sr"></span>
                                 </div>

@@ -1,9 +1,14 @@
-<div class="d-flex justify-content-end mb-3">
-    <div class="col-md-2">
-        <span class="badge bg-success fs-5 p-2">
-            <strong>Total Neto:</strong> {{ number_format($sumaNetos, 2) }}
-        </span>
+<!-- CUADRO AMARILLO GRANDE CON LA SUMA -->
+<div class="alert alert-warning border-warning mb-4" style="background-color: #fff3cd; border: 3px solid #ffc107;">
+    <div class="d-flex justify-content-center align-items-center">
+        <h2 class="mb-0 fw-bold text-dark">
+            <i class="bi bi-calculator-fill me-2"></i>
+            TOTAL NETO: {{ number_format($sumaNetos, 2) }} KG
+        </h2>
     </div>
+</div>
+
+<div class="d-flex justify-content-end mb-3 gap-2">
     <div class="col-md-2">
         <select id="estado-masivo" class="form-control">
             <option value="">Seleccionar estado</option>
@@ -27,16 +32,20 @@
             <input type="hidden" id="lote-masivo-id">
         </div>
     </div>
-
-    <div class="col-md-2">
+    <div class="col-md-auto">
         <button class="btn btn-primary" id="btn-asignar-masivo">
             <i class="bi bi-check2-circle"></i> Asignar Seleccionados
         </button>
     </div>
+    <div class="col-md-auto">
+        <button type="button" class="btn btn-success" id="btn-exportar">
+            <i class="bi bi-file-earmark-excel"></i> Exportar Excel
+        </button>
+    </div>
 </div>
 
+<!-- TABLA DE DATOS -->
 <div style="overflow-x: auto;">
-    <table class="table table-bordered table-hover align-middle text-center"></table>
     <table class="table table-bordered table-hover align-middle text-center">
         <thead class="table-light">
             <tr>
@@ -63,7 +72,6 @@
                 @php
                     $estadoActual = optional($peso->estado);
                     $loteActual = optional($peso->lote);
-
                     $tieneEstado = !is_null($estadoActual->id);
 
                     $liquidado = $estadoActual->id === 3;
@@ -80,7 +88,7 @@
                         $filaClase = 'bg-cancha';
                     } elseif ($procesado) {
                         $filaClase = 'bg-procesado';
-                    } // neutro
+                    }
                 @endphp
 
                 <tr class="{{ $filaClase }}">
@@ -107,26 +115,26 @@
                                 placeholder="Escriba o seleccione..." value="{{ $loteActual->nombre ?? '' }}"
                                 data-peso="{{ $peso->NroSalida }}" style="min-width: 150px;"
                                 @if ($tieneEstado) disabled @endif>
+
                             <select class="lote-select form-control form-control-sm" size="5"
                                 style="display: none; min-width: 150px; text-align: left;">
                                 @foreach ($lotes as $loteOption)
-                                    <option value="{{ $loteOption->id }}"
-                                        data-codigo="{{ $loteOption->codigo_base }}">
+                                    <option value="{{ $loteOption->id }}">
                                         {{ $loteOption->nombre }}
                                     </option>
                                 @endforeach
                             </select>
-
-                            <input type="hidden" name="lote_id[]" class="lote-hidden"
-                                value="{{ $loteActual->id ?? '' }}">
                         </div>
                     </td>
-
                     <td>
                         @if (!$tieneEstado)
                             <button class="btn btn-success btn-sm guardar-btn" data-peso="{{ $peso->NroSalida }}">
                                 <i class="bi bi-save"></i> Guardar
                             </button>
+                        @else
+                            <span class="badge bg-secondary">
+                                <i class="bi bi-check-circle"></i> Guardado
+                            </span>
                         @endif
                     </td>
                     <td>{{ $peso->Fechai }}</td>
@@ -142,13 +150,17 @@
                 </tr>
             @empty
                 <tr>
-                    <td colspan="14" class="text-center text-muted py-4">
-                        <i class="bi bi-inbox"></i> No hay registros
+                    <td colspan="15" class="text-center text-muted py-4">
+                        <i class="bi bi-inbox fs-3"></i>
+                        <p class="mb-0 mt-2">No hay registros que coincidan con los filtros</p>
                     </td>
                 </tr>
             @endforelse
         </tbody>
     </table>
 
-    {{ $pesos->links() }}
+    <!-- PAGINACIÓN -->
+    <div class="d-flex justify-content-center">
+        {{ $pesos->links() }}
+    </div>
 </div>

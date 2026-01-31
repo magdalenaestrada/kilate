@@ -15,7 +15,7 @@
 
                               <div class="combo">
                                   <input type="text" id="lote_id_input" class="form-control"
-                                      placeholder="Escriba o seleccione...">
+                                      placeholder="Escriba o seleccione..." autocomplete="off">
 
                                   <select id="lote_id" class="form-control" size="5" style="display:none;">
                                       @foreach ($lotes as $lote)
@@ -28,10 +28,17 @@
                           </div>
                           <div class="col-md-4">
                               <label class="form-label fw-semibold">Circuito</label>
-                              <select id="circuito" class="form-control">
-                                  <option value="">Seleccione</option>
-                                  <option value="A">A</option>
-                                  <option value="B">B</option>
+                              <select class="form-control" name="circuito" id="circuito">
+                                  @if ($circuitos->isEmpty())
+                                      <option value="" selected disabled>No hay circuitos disponibles</option>
+                                  @else
+                                      <option value="" selected disabled>Seleccione</option>
+                                      @foreach ($circuitos as $circuito)
+                                          <option value="{{ $circuito->id }}">
+                                              {{ $circuito->descripcion }}
+                                          </option>
+                                      @endforeach
+                                  @endif
                               </select>
                           </div>
                           <div class="col-md-4">
